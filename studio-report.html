@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:url" content="https://villametal.github.io/villametal/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="VILLA-METAL | Studio Report">
+    <meta property="og:description" content="Prática de conjunto de Metal da Escola de Música Villa Lobos">
+    <meta property="og:image" content="https://villametal.github.io/villametal/Logo Villa-Metal.png">   
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="https://villametal.github.io/villametal/">
+    <meta property="twitter:url" content="https://villametal.github.io/villametal/">
+    <meta name="twitter:title" content="VILLA-METAL | Studio Report">
+    <meta name="twitter:description" content="Prática de conjunto de Metal da Escola de Música Villa Lobos">
+    <meta name="twitter:image" content="https://villametal.github.io/villametal/Logo Villa-Metal.png">
+    <title>VILLA-METAL | Studio Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+        .video-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-gray-100">
+    <!-- Header -->
+    <header class="bg-black/80 backdrop-blur-md sticky top-0 z-50 shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <span class="text-red-500 text-3xl mr-3"></span>
+                    <h1 class="w-36 md:w-52">
+                        <img src="Logo_Villa-Metal transparent.png" alt="">
+                    </h1>
+                </div>
+                </div>
+                
+                <nav class="w-full md:w-auto">
+                    <ul class="flex flex-wrap justify-center md:justify-end space-x-1 md:space-x-4">
+                        <li>
+                            <a href="index.html" class="px-2 py-1 md:px-3 md:py-2 rounded-md hover:bg-gray-800 transition flex items-center text-sm md:text-base">
+                                <i class="fas fa-home mr-1 md:mr-2 text-red-500"></i>
+                                Home
+                            </a>
+                        </li>
+                        <li>
+                            <a href="lineup.html" class="px-2 py-1 md:px-3 md:py-2 rounded-md hover:bg-gray-800 transition flex items-center text-sm md:text-base">
+                                <i class="fas fa-users mr-1 md:mr-2 text-red-500"></i>
+                                Line-up
+                            </a>
+                        </li>
+                        <li>
+                            <a href="studio-report.html" class="px-2 py-1 md:px-3 md:py-2 rounded-md bg-gray-800 text-red-400 font-medium flex items-center text-sm md:text-base">
+                                <i class="fas fa-headphones mr-1 md:mr-2"></i>
+                                Studio Report
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <section class="max-w-6xl mx-auto">
+            <div class="text-center mb-8 md:mb-12">
+                <h2 class="text-2xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-red-500 to-yellow-500 bg-clip-text text-transparent">
+                    STUDIO REPORT
+                </h2>
+                <p class="text-gray-300 max-w-2xl mx-auto">Registros dos nossos ensaios e gravações em estúdio</p>
+            </div>
+
+            <!-- Video Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Video Card 1 -->
+                <div class="video-card bg-gray-800/50 rounded-lg overflow-hidden border border-gray-700">
+                    <div class="video-container">
+                        <iframe src="https://youtu.be/zjNAgF0xeN0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold text-red-400 mb-2">Villa-Metal - Studio Report #1 (25/05/2025)</h3>
+                        <p class="text-gray-300 text-sm">Ensaio testando as músicas "Memórias" (Pitty) e "Symphony of Destruction" (Megadeth).
+
+                            Bia - Voz
+                            Nathan - Guitarra
+                            Wendell - Guitarra e baixo
+                            Jonas - Bateria
+                            Bru - Baixo</p>
+                    </div>
+                </div>
+
+                <!-- Video Card 2 -->
+                <div class="video-card bg-gray-800/50 rounded-lg overflow-hidden border border-gray-700">
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold text-red-400 mb-2">Título</h3>
+                        <p class="text-gray-300 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis doloremque quo tempora labore harum eaque consequatur cumque, sint facilis molestias repellat, eligendi neque quos.</p>
+                    </div>
+                </div>
+
+                <!-- Video Card 3 -->
+                <div class="video-card bg-gray-800/50 rounded-lg overflow-hidden border border-gray-700">
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold text-red-400 mb-2">Título</h3>
+                        <p class="text-gray-300 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis doloremque quo tempora labore harum eaque consequatur cumque, sint facilis molestias repellat, eligendi neque quos</p>
+                    </div>
+                </div>
+
+                <!-- Video Card 4 -->
+                <div class="video-card bg-gray-800/50 rounded-lg overflow-hidden border border-gray-700">
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold text-red-400 mb-2">Título</h3>
+                        <p class="text-gray-300 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis doloremque quo tempora labore harum eaque consequatur cumque, sint facilis molestias repellat, eligendi neque quos</p>
+                    </div>
+                </div>
+
+                <!-- Video Card 5 -->
+                <div class="video-card bg-gray-800/50 rounded-lg overflow-hidden border border-gray-700">
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold text-red-400 mb-2">Título</h3>
+                        <p class="text-gray-300 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis doloremque quo tempora labore harum eaque consequatur cumque, sint facilis molestias repellat, eligendi neque quos</p>
+                    </div>
+                </div>
+
+                <!-- Video Card 6 -->
+                <div class="video-card bg-gray-800/50 rounded-lg overflow-hidden border border-gray-700">
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold text-red-400 mb-2">Título</h3>
+                        <p class="text-gray-300 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis doloremque quo tempora labore harum eaque consequatur cumque, sint facilis molestias repellat, eligendi neque quos</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Video Button -->
+            <div class="mt-8 text-center hidden">
+                <button id="add-video" class="px-6 py-2 bg-red-600 hover:bg-red-700 rounded-md transition flex items-center mx-auto">
+                    <i class="fas fa-plus mr-2"></i>
+                    Adicionar Novo Vídeo
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black/80 mt-12 py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0 text-center md:text-left">
+                    <h2 class="text-xl md:text-2xl font-bold bg-gradient-to-r from-red-500 to-yellow-500 bg-clip-text text-transparent">
+                        VILLA-METAL
+                    </h2>
+                    <p class="text-gray-400 mt-1 text-sm md:text-base">Prática de conjunto de Metal da Escola de Música Villa-Lobos</p>
+                </div>
+                
+                <div class="flex space-x-4 md:space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-red-500 transition">
+                        <i class="fab fa-instagram text-lg md:text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-red-500 transition">
+                        <i class="fab fa-youtube text-lg md:text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-6 pt-6 text-center text-gray-500 text-sm md:text-base">
+                <p>© 2025 todos os direitos reservados - <a href="https://wa.me/5521989978029" class="text-red-400 hover:text-red-300 transition" target="_blank">Bru Cardoso Coder</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Add Video Modal -->
+    <div id="video-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4">
+            <div class="text-center">
+                <h3 class="text-xl font-bold mb-4">Adicionar Novo Vídeo</h3>
+                
+                <form id="video-form" class="space-y-4">
+                    <div>
+                        <label class="block text-gray-300 text-sm mb-1">Título do Vídeo</label>
+                        <input type="text" class="w-full bg-gray-700 rounded-md px-3 py-2 text-white" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-300 text-sm mb-1">URL do YouTube</label>
+                        <input type="url" class="w-full bg-gray-700 rounded-md px-3 py-2 text-white" placeholder="https://www.youtube.com/watch?v=..." required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-300 text-sm mb-1">Descrição</label>
+                        <textarea class="w-full bg-gray-700 rounded-md px-3 py-2 text-white" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="flex space-x-4 pt-2">
+                        <button type="button" id="cancel-video" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-md transition flex-1">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-md transition flex-1">
+                            Salvar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Modal de adicionar vídeo
+            const videoModal = document.getElementById('video-modal');
+            const addVideoBtn = document.getElementById('add-video');
+            const cancelVideoBtn = document.getElementById('cancel-video');
+            const videoForm = document.getElementById('video-form');
+            
+            addVideoBtn.addEventListener('click', () => {
+                videoModal.classList.remove('hidden');
+            });
+            
+            cancelVideoBtn.addEventListener('click', () => {
+                videoModal.classList.add('hidden');
+                videoForm.reset();
+            });
+            
+            videoForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Aqui você implementaria a lógica para salvar no banco de dados
+                // Por enquanto, apenas fecha o modal
+                videoModal.classList.add('hidden');
+                videoForm.reset();
+                
+                alert('Em uma implementação real, o vídeo seria salvo no banco de dados!');
+            });
+            
+            // Extrair ID do YouTube para embed (exemplo de função)
+            function getYouTubeId(url) {
+                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                const match = url.match(regExp);
+                return (match && match[2].length === 11) ? match[2] : null;
+            }
+        });
+    </script>
+</body>
+</html>
