@@ -25,6 +25,32 @@
         .gradient-bg {
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         }
+        header {
+                transition: all 0.3s ease;
+                position: sticky;
+                top: 0;
+                z-index: 1000; /* Garante que o header fique acima de tudo */
+            }
+            /* Estado compacto */
+            .header-scrolled {
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+            }
+            
+            .header-scrolled .logo-container img {
+                width: 120px !important;
+            }
+            
+            .header-scrolled .logo-container p {
+                display: none !important;
+            }
+            
+            @media (max-width: 768px) {
+                .header-scrolled nav li span {
+                    display: none !important;
+                }
+            
+        }
         .input-highlight {
             transition: all 0.3s ease;
         }
@@ -94,6 +120,12 @@
         
         /* Responsive table */
         @media (max-width: 1024px) {
+            header {
+                transition: all 0.3s ease;
+                position: sticky;
+                top: 0;
+                z-index: 1000; /* Garante que o header fique acima de tudo */
+            }
             .lineup-row {
                 grid-template-columns: repeat(3, 1fr) !important;
             }
@@ -114,6 +146,12 @@
         }
         
         @media (max-width: 640px) {
+            header {
+                transition: all 0.3s ease;
+                position: sticky;
+                top: 0;
+                z-index: 1000; /* Garante que o header fique acima de tudo */
+            }
             .lineup-row {
             grid-template-columns: repeat(5, 1fr) !important;
             grid-template-rows: auto auto;
@@ -196,8 +234,8 @@
                 grid-column: 5;
                 grid-row: 2;
             }
-            /* Estilo para o header */
-            header {
+        /* Estilo para o header */
+        header {
                 transition: all 0.3s ease;
                 position: sticky;
                 top: 0;
@@ -221,8 +259,9 @@
                 .header-scrolled nav li span {
                     display: none !important;
                 }
-            }
+            
         }
+    }
     </style>
 </head>
 <body class="gradient-bg min-h-screen text-gray-100">
