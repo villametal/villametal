@@ -38,20 +38,64 @@
         .countdown-number {
             text-shadow: 0 0 10px rgba(220, 38, 38, 0.7);
         }
+        /* Estilo para o header */
+        header {
+            transition: all 0.3s ease;
+            position: sticky;
+            top: 0;
+            z-index: 1000; /* Garante que o header fique acima de tudo */
+        }
+        
+        /* Estado compacto */
+        .header-scrolled {
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+        
+        .header-scrolled .logo-container img {
+            width: 120px !important;
+        }
+        
+        .header-scrolled .logo-container p {
+            display: none !important;
+        }
+        
+        @media (max-width: 768px) {
+            .header-scrolled nav li span {
+                display: none !important;
+            }
+        }
+
+        /* Ajuste da Hero Section para iPad */
+        @media (min-width: 768px) and (max-width: 1279px) {
+            .hero-section .band-photo {
+                max-width: 90%;
+                margin-top: 1rem;
+            }
+            .hero-section .text-content {
+                padding-right: 1rem;
+            }
+        }
+
+        /* Garante que os vídeos passem por trás do menu */
+        .video-section {
+            position: relative;
+            z-index: 10; /* Valor menor que o header */
+        }
     </style>
 </head>
 <body class="gradient-bg min-h-screen text-gray-100">
     <!-- Header -->
-    <header class="bg-black/80 backdrop-blur-md top-0 z-50 shadow-lg">
-        <div class="container mx-auto px-4 py-4">
+    <header class="bg-black/80 backdrop-blur-md shadow-lg py-4" id="mainHeader">
+        <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="flex flex-col items-center mb-0 md:mb-0">
-                    <span class="text-red-500 text-3xl mr-3"></span>
+                <div class="flex flex-col items-center mb-0 md:mb-0 logo-container">
                     <a href="https://villametal.github.io/villametal">
-                        <img class="mx-auto w-64 md:w-full" src="Logo_Villa-Metal transparent.png" alt=""></a>
-                <p class="text-xs md:text-2xl text-gray-300 mb-2">
-                    Prática de conjunto de Metal da Escola de Música Villa-Lobos
-                </p>
+                        <img class="mx-auto w-64 transition-all duration-300" src="Logo_Villa-Metal transparent.png" alt="">
+                    </a>
+                    <p class="text-xs md:text-sm text-gray-300 mb-2">
+                        Prática de conjunto de Metal da Escola de Música Villa-Lobos
+                    </p>
                 </div>
                 
                 <nav class="w-full md:w-auto">
@@ -59,19 +103,19 @@
                         <li>
                             <a href="index.html" class="px-2 py-1 md:px-3 md:py-2 rounded-md bg-gray-800 text-red-400 font-medium flex items-center text-sm md:text-base">
                                 <i class="fas fa-home mr-1 md:mr-2"></i>
-                                Home
+                                <span>Home</span>
                             </a>
                         </li>
                         <li>
                             <a href="lineup.html" class="px-2 py-1 md:px-3 md:py-2 rounded-md hover:bg-gray-800 transition flex items-center text-sm md:text-base">
                                 <i class="fas fa-users mr-1 md:mr-2 text-red-500"></i>
-                                Line-up
+                                <span>Line-up</span>
                             </a>
                         </li>
                         <li>
                             <a href="studio-report.html" class="px-2 py-1 md:px-3 md:py-2 rounded-md hover:bg-gray-800 transition flex items-center text-sm md:text-base">
                                 <i class="fas fa-headphones mr-1 md:mr-2 text-red-500"></i>
-                                Studio Report
+                                <span>Studio Report</span>
                             </a>
                         </li>
                     </ul>
@@ -81,16 +125,15 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="hero-pattern py-6 md:py-24">
+    <section class="hero-pattern py-6 md:py-24 hero-section">
         <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
-            <div class="md:w-1/2 mb-10 md:mb-0 md:pr-10">
-                
+            <div class="md:w-1/2 mb-10 md:mb-0 md:pr-10 text-content">
                 <p class="text-gray-400 text-sm/4 md:text-lg mb-4 md:mb-8">
                     Prática de conjunto especializada nas principais vertentes do <strong>Metal</strong> — do <strong>Heavy Metal</strong> clássico às complexidades do <strong>Metal Progressivo</strong> e à grandiosidade orquestral do <strong>Symphonic Metal</strong> —, reunindo alunos amantes do gênero e interessados em dominar suas técnicas. Nosso objetivo é construir um trabalho que represente a riqueza cultural do Metal, demonstrando a capacidade da Escola de Música Villa-Lobos em formar músicos completos através do trabalho colaborativo, aptos a executar com excelência toda a diversidade do gênero.
-<br>
-<em>Direção: Bru Cardoso</br>
+                    <br>
+                    <em>Direção: Bru Cardoso</em>
                 </p>
-                <p class= "text-gray-400 mb-0 md:mb-8 italic">"Agradecemos o apoio do <strong>Mestre Wlad</strong>!"</p>
+                <p class="text-gray-400 mb-0 md:mb-8 italic">"Agradecemos o apoio do <strong>Mestre Wlad</strong>!"</p>
                 <div class="flex space-x-4 hidden">
                     <a href="lineup.html" class="px-6 py-3 bg-red-600 hover:bg-red-700 rounded-md transition font-medium">
                         Conheça a Banda
@@ -138,7 +181,7 @@
     </section>
 
     <!-- Latest Videos Section -->
-    <section class="py-16">
+    <section class="py-16 video-section">
         <div class="container mx-auto px-4">
             <h2 class="text-3xl md:text-4xl font-bold mb-12 text-center bg-gradient-to-r from-red-500 to-yellow-500 bg-clip-text text-transparent">
                 ÚLTIMOS VÍDEOS
@@ -239,31 +282,29 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-black/80 py-12">
+    <footer class="bg-black/80 py-6">
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="mb-6 md:mb-0 text-center md:text-left">
-                    <h2 class="text-xl md:text-2xl font-bold bg-gradient-to-r from-red-500 to-yellow-500 bg-clip-text text-transparent">
+                <div class="mb-4 md:mb-0 text-center md:text-left">
+                    <h2 class="text-lg md:text-xl font-bold bg-gradient-to-r from-red-500 to-yellow-500 bg-clip-text text-transparent">
                         VILLA-METAL
                     </h2>
-                    <p class="text-gray-400 mt-1 text-sm md:text-base">Prática de conjunto de Metal da Escola de Música Villa-Lobos</p>
+                    <p class="text-gray-400 mt-1 text-xs md:text-sm">Prática de conjunto de Metal da Escola de Música Villa-Lobos</p>
                 </div>
                 
                 <div class="flex flex-col items-center md:items-end">
-                    <div class="flex space-x-6 mb-4">
+                    <div class="flex space-x-4 md:space-x-6 mb-3">
                         <a href="https://www.instagram.com/villametal.emvl" target="_blank" class="text-gray-400 hover:text-red-500 transition">
-                            <i class="fab fa-instagram text-xl"></i>
+                            <i class="fab fa-instagram text-lg"></i>
                         </a>
                         <a href="https://www.youtube.com/@villametalemvl" target="_blank" class="text-gray-400 hover:text-red-500 transition">
-                            <i class="fab fa-youtube text-xl"></i>
+                            <i class="fab fa-youtube text-lg"></i>
                         </a>
                     </div>
-                    <a href="mailto:contato@villametal.com" class="text-gray-400 hover:text-red-300 text-sm">
-                    </a>
                 </div>
             </div>
             
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500 text-sm">
+            <div class="border-t border-gray-800 mt-4 pt-4 text-center text-gray-500 text-xs">
                 <p>© 2025 VILLA-METAL. Todos os direitos reservados.</p>
                 <p class="mt-1">Desenvolvido por <a href="https://wa.me/5521989978029" class="text-red-400 hover:text-red-300">Bru Cardoso Coder</a></p>
             </div>
@@ -285,6 +326,17 @@
             document.querySelector('.countdown-number:nth-child(2)').textContent = hours;
             document.querySelector('.countdown-number:nth-child(3)').textContent = minutes;
         }
+        
+        // Efeito de scroll no header
+        const header = document.getElementById('mainHeader');
+        
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
+        });
         
         // Atualiza a cada minuto
         updateCountdown();
