@@ -26,6 +26,11 @@
         .hero-pattern {
             background-image: radial-gradient(circle at 10% 20%, rgba(220, 38, 38, 0.1) 0%, transparent 20%),
                               radial-gradient(circle at 90% 80%, rgba(234, 179, 8, 0.1) 0%, transparent 20%);
+            display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 80%;
+  margin: 0 auto;
         }
         .band-photo {
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
@@ -63,11 +68,33 @@
         .header-scrolled .logo-container p {
             display: none !important;
         }
+        #youtube-container {
+  width: 720px;
+  height: 405px;
+  position: relative;
+  }
+
+  #youtube-container iframe {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+  }
         
         @media (max-width: 768px) {
             .header-scrolled nav li span {
                 display: none !important;
             }
+            #youtube-container {
+  width: 90vw;
+  position: relative;
+  }
+
+  #youtube-container iframe {
+    width: 100%;
+    height: 70%;
+    top: 0;
+  }
         }
 
         /* Ajuste da Hero Section para iPad */
@@ -147,8 +174,8 @@
                         </a>
                     </div>
                 </div>
-            <div>
-                <iframe width="720" height="405" src="https://www.youtube.com/embed/f8tprYaomiA?si=7V98bjXRTb5zgdtl" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            <div id="youtube-container" class="mw-auto mh-auto">
+                <iframe src="https://www.youtube.com/embed/f8tprYaomiA"></iframe>
             </div>
          </div>
     </section>
