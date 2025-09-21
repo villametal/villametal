@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backstage - Villa Metal</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: rgba(25, 25, 35, 0.9);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(90deg, #0f0c29, #302b63, #24243e);
+      padding: 10px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      background: linear-gradient(45deg, #dc2626, #f59e0b);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .header p {
+      color: #94a3b8;
+      font-size: 1.1rem;
+    }
+    
+    .content {
+      padding: 25px;
+    }
+    
+    .form-container {
+      margin-bottom: 10px;
+    }
+    
+    .form-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      color: #e2e8f0;
+    }
+    
+    .form-title i {
+      color: #dc2626;
+    }
+    
+    .input-group {
+      margin-bottom: 10px;
+      position: relative;
+    }
+    
+    .input-group i {
+      position: absolute;
+      left: 15px;
+      top: 15px;
+      color: #94a3b8;
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 10px 10px 10px 40px;
+      border: 1px solid #4b5563;
+      border-radius: 8px;
+      background-color: rgba(15, 23, 42, 0.7);
+      color: #f1f5f9;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: #dc2626;
+      box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.3);
+    }
+    
+    input::placeholder {
+      color: #94a3b8;
+    }
+    
+    button {
+      width: 100%;
+      padding: 10px;
+      background: linear-gradient(45deg, #dc2626, #ef4444);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      transition: all 0.3s;
+      margin-top: 10px;
+    }
+    
+    button:hover {
+      background: linear-gradient(45deg, #b91c1c, #dc2626);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(220, 38, 38, 0.4);
+    }
+    
+    button:disabled {
+      background: #4b5563;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 25px 0;
+      color: #94a3b8;
+    }
+    
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #4b5563;
+    }
+    
+    .divider::before {
+      margin-right: 15px;
+    }
+    
+    .divider::after {
+      margin-left: 15px;
+    }
+    
+    .admin-section {
+      background: rgba(30, 30, 40, 0.6);
+      padding: 8px;
+      border-radius: 8px;
+      margin-top: 25px;
+      border: 1px solid rgba(220, 38, 38, 0.2);
+    }
+    
+    .admin-section h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      color: #f8fafc;
+    }
+    
+    .admin-section h3 i {
+      color: #f59e0b;
+    }
+    
+    .admin-list {
+      margin-top: 15px;
+    }
+    
+    .admin-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    
+    .admin-item span {
+      font-weight: bold;
+    }
+    
+    .admin-item button {
+      width: auto;
+      padding: 5px 10px;
+      font-size: 14px;
+      background: #dc2626;
+      margin-left: 10px;
+    }
+    
+    .admin-item .approve-btn {
+      background: #16a34a;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .message {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .error {
+      background: rgba(220, 38, 38, 0.2);
+      border: 1px solid #dc2626;
+      color: #fca5a5;
+    }
+    
+    .success {
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid #16a34a;
+      color: #86efac;
+    }
+    
+    .pending {
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid #d97706;
+      color: #fcd34d;
+    }
+    
+    .login-section {
+      margin-top: 20px;
+      padding: 8px;
+      background: rgba(30, 30, 40, 0.6);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .portal-container {
+      width: 100%;
+      max-width: 1000px;
+      background: rgba(25, 25, 35, 0.9);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+    
+    .portal-header {
+      background: linear-gradient(90deg, #0f0c29, #302b63, #24243e);
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .portal-header h2 {
+      font-size: 1.8rem;
+      background: linear-gradient(45deg, #dc2626, #f59e0b);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .user-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      border: 2px solid #dc2626;
+    }
+    
+    .portal-content {
+      padding: 30px;
+    }
+    
+    .welcome-section {
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(30, 30, 40, 0.7));
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      text-align: center;
+      border: 1px solid rgba(220, 38, 38, 0.2);
+    }
+    
+    .welcome-section h3 {
+      color: #f8fafc;
+      margin-bottom: 15px;
+      font-size: 1.8rem;
+    }
+    
+    .welcome-section p {
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+    
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    
+    .card {
+      background: rgba(30, 30, 40, 0.7);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.5);
+      border-color: rgba(220, 38, 38, 0.3);
+    }
+    
+    .card h4 {
+      color: #f8fafc;
+      margin-bottom: 15px;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .card h4 i {
+      color: #dc2626;
+    }
+    
+    .card p {
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    .status-section {
+      text-align: center;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+    }
+
+     .back-button {
+      background: linear-gradient(45deg, #4b5563, #6b7280);
+      position: absolute;
+      width: 50px;
+      left: 5px; top: 5px;
+      padding: 5px 1px;
+      margin: 0;
+    }
+
+    .back-button i {
+      font-size: 25px;
+    }
+    
+    @media (max-width: 768px) {
+      .container, .portal-container {
+        width: 100%;
+        max-width: 100%;
+      }
+      
+      .portal-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
+      
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+      
+      .admin-item {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .admin-item button {
+        width: 100%;
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="register-page">
+    <div class="container">
+      <button class="back-button" onclick="window.history.back()">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+      <div class="header">
+        <h1><i class="fas fa-door-closed"></i>Backstage<br>Villa Metal</h1>
+        <p>Solicite acesso ao Backstage</p>
+      </div>
+      
+      <div class="content">
+        <div id="message" class="message hidden"></div>
+        
+        <div class="form-container">
+          <div class="form-title">
+            <i class="fas fa-user-plus"></i>
+            <h2>Solicitar Acesso</h2>
+          </div>
+          
+          <div class="input-group">
+            <i class="fas fa-user"></i>
+            <input type="text" id="name" placeholder="Seu nome" required>
+          </div>
+          
+          <div class="input-group">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="email" placeholder="Seu email" required>
+          </div>
+          
+          <div class="input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" placeholder="Crie uma senha" required minlength="6">
+          </div>
+          
+          <div class="input-group">
+            <i class="fas fa-music"></i>
+            <select id="instrument" required>
+              <option value="">Selecione seu instrumento</option>
+              <option value="Vocal">Vocal</option>
+              <option value="Guitarra">Guitarra</option>
+              <option value="Baixo">Baixo</option>
+              <option value="Bateria">Bateria</option>
+              <option value="Teclado">Teclado</option>
+              <option value="Outro">Outro</option>
+            </select>
+          </div>
+          
+          <button id="register-btn">Solicitar Acesso</button>
+        </div>
+        
+        <div class="status-section hidden" id="status-section">
+          <h3>Status do seu cadastro</h3>
+          <p id="status-message"></p>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="login-section">
+          <div class="form-title">
+            <i class="fas fa-key"></i>
+            <h2>Já sou cadastrado</h2>
+          </div>
+          
+          <div class="input-group">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="login-email" placeholder="Seu email" required>
+          </div>
+          
+          <div class="input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="login-password" placeholder="Sua senha" required>
+          </div>
+          
+          <button id="login-btn">Acessar Backstage</button>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="admin-section">
+          <h3><i class="fas fa-user-shield"></i> Área do Administrador</h3>
+          <div class="input-group">
+            <i class="fas fa-key"></i>
+            <input type="password" id="admin-password" placeholder="Senha de administrador" required>
+          </div>
+          <button id="admin-login">Acessar Painel Admin</button>
+          
+          <div id="admin-panel" class="admin-panel hidden">
+            <h3>Solicitações de Acesso</h3>
+            <div class="admin-list" id="pending-list">
+              <!-- Lista de solicitações pendentes será preenchida aqui -->
+            </div>
+            
+            <h3>Usuários Aprovados</h3>
+            <div class="admin-list" id="approved-list">
+              <!-- Lista de usuários aprovados será preenchida aqui -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Página do Portal (após login) -->
+  <div id="portal-page" class="hidden">
+    <div class="portal-container">
+      <div class="portal-header">
+        <h2><i class="fas fa-door-open"></i> Backstage Villa Metal</h2>
+        <div class="user-info">
+          <img id="user-avatar" class="user-avatar" src="" alt="Avatar">
+          <button id="logout-btn">Sair</button>
+        </div>
+      </div>
+      
+      <div class="portal-content">
+        <div class="welcome-section">
+          <h3>Bem-vindo(a) ao Backstage, <span id="user-name"></span>!</h3>
+          <p>Esta é sua área exclusiva para acessar recursos, partituras, cronogramas e informações da prática de conjunto Villa-Metal.</p>
+        </div>
+        
+        <div class="dashboard">
+          <div class="card">
+            <a href="frequency.html"><h4><i class="fas fa-calendar-check"></i> Frequência</h4>
+            <p>Acompanhe seu histórico de presenças e ensaios. Visualize relatórios de participação.</p></a>
+          </div>
+          
+          <div class="card">
+            <h4><i class="fas fa-music"></i> Repertório</h4>
+            <p>Acesse as músicas em estudo, partituras, tabs e materiais de apoio para ensaio.</p>
+          </div>
+          
+          <div class="card">
+            <h4><i class="fas fa-bullhorn"></i> Comunicados</h4>
+            <p>Fique por dentro dos avisos, novidades e eventos da Villa-Metal.</p>
+          </div>
+          
+          <div class="card">
+            <h4><i class="fas fa-calendar-alt"></i> Agenda</h4>
+            <p>Confira os próximos ensaios, apresentações e eventos programados.</p>
+          </div>
+
+          <div class="card">
+            <h4><i class="fas fa-video"></i> Studio Reports</h4>
+            <p>Assista aos vídeos dos ensaios e apresentações anteriores.</p>
+          </div>
+          
+          <div class="card">
+            <h4><i class="fas fa-users"></i> Membros</h4>
+            <p>Conheça os integrantes da Villa-Metal e seus instrumentos.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+  <script>
+    // Inicializar EmailJS
+    (function() {
+      emailjs.init("PCPbUnUd73-f3NXPK");
+    })();
+    
+    // Configuração do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDYToHqDE7kC4Onprf5U7aW7RLXBOLpJx8",
+      authDomain: "villa-metal.firebaseapp.com",
+      projectId: "villa-metal",
+      storageBucket: "villa-metal.firebasestorage.app",
+      messagingSenderId: "622030637005",
+      appId: "1:622030637005:web:5d2e5203a64f4cc35ba684"
+    };
+    
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    
+    // Elementos da DOM
+    const registerPage = document.getElementById('register-page');
+    const portalPage = document.getElementById('portal-page');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const instrumentInput = document.getElementById('instrument');
+    const registerBtn = document.getElementById('register-btn');
+    const loginEmailInput = document.getElementById('login-email');
+    const loginPasswordInput = document.getElementById('login-password');
+    const loginBtn = document.getElementById('login-btn');
+    const adminPasswordInput = document.getElementById('admin-password');
+    const adminLoginBtn = document.getElementById('admin-login');
+    const adminPanel = document.getElementById('admin-panel');
+    const pendingList = document.getElementById('pending-list');
+    const approvedList = document.getElementById('approved-list');
+    const logoutBtn = document.getElementById('logout-btn');
+    const userName = document.getElementById('user-name');
+    const userAvatar = document.getElementById('user-avatar');
+    const messageDiv = document.getElementById('message');
+    const statusSection = document.getElementById('status-section');
+    const statusMessage = document.getElementById('status-message');
+    
+    // Senha de administrador
+    const ADMIN_PASSWORD = "villalobosmetaleiro";
+    
+    // Verificar se já existe um cadastro para este navegador
+    function checkExistingRegistration() {
+      const userEmail = localStorage.getItem('villaMetalUserEmail');
+      if (userEmail) {
+        db.collection('registrations').doc(userEmail).get()
+          .then((doc) => {
+            if (doc.exists) {
+              const data = doc.data();
+              showStatus(data.status);
+              
+              // Se já estiver aprovado, preencher o email para login
+              if (data.status === 'approved') {
+                loginEmailInput.value = userEmail;
+              }
+            }
+          });
+      }
+    }
+    
+    // Mostrar status do cadastro
+    function showStatus(status) {
+      statusSection.classList.remove('hidden');
+      
+      if (status === 'pending') {
+        statusMessage.textContent = 'Seu cadastro está em análise. Aguarde a aprovação.';
+        statusSection.className = 'status-section pending';
+      } else if (status === 'approved') {
+        statusMessage.textContent = 'Seu cadastro foi aprovado! Você já pode acessar a área restrita.';
+        statusSection.className = 'status-section success';
+      } else if (status === 'rejected') {
+        statusMessage.textContent = 'Seu cadastro não foi aprovado. Entre em contato para mais informações.';
+        statusSection.className = 'status-section error';
+      }
+    }
+    
+    // Mostrar mensagem
+    function showMessage(text, type) {
+      messageDiv.textContent = text;
+      messageDiv.className = `message ${type}`;
+      messageDiv.classList.remove('hidden');
+      
+      setTimeout(() => {
+        messageDiv.classList.add('hidden');
+      }, 5000);
+    }
+    
+    // Solicitar cadastro - CORREÇÃO AQUI
+    registerBtn.addEventListener('click', () => {
+      const name = nameInput.value.trim();
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const instrument = instrumentInput.value;
+      
+      // CORREÇÃO: Removida a verificação dos campos comentados
+      if (!name || !email || !password || !instrument) {
+        showMessage('Por favor, preencha todos os campos.', 'error');
+        return;
+      }
+      
+      if (password.length < 6) {
+        showMessage('A senha deve ter pelo menos 6 caracteres.', 'error');
+        return;
+      }
+      
+      // Verificar se o email já está cadastrado
+      db.collection('registrations').doc(email).get()
+        .then((doc) => {
+          if (doc.exists) {
+            showMessage('Este email já está cadastrado.', 'error');
+            return;
+          }
+          
+          // Salvar solicitação de cadastro (com hash da senha)
+          const passwordHash = btoa(password);
+          
+          return db.collection('registrations').doc(email).set({
+            name: name,
+            email: email,
+            passwordHash: passwordHash,
+            instrument: instrument,
+            status: 'pending',
+            requestedAt: new Date()
+          });
+        })
+        .then(() => {
+          showMessage('Solicitação enviada com sucesso! Aguarde a aprovação.', 'success');
+          showStatus('pending');
+          
+          // Limpar formulário
+          nameInput.value = '';
+          emailInput.value = '';
+          passwordInput.value = '';
+          instrumentInput.value = '';
+          
+          // Salvar email no localStorage para verificar status posteriormente
+          localStorage.setItem('villaMetalUserEmail', email);
+        })
+        .catch((error) => {
+          console.error('Erro ao enviar solicitação:', error);
+          showMessage('Erro ao enviar solicitação. Tente novamente.', 'error');
+        });
+    });
+    
+    // Login de usuário
+    loginBtn.addEventListener('click', () => {
+      const email = loginEmailInput.value.trim();
+      const password = loginPasswordInput.value;
+      
+      if (!email || !password) {
+        showMessage('Por favor, informe email e senha.', 'error');
+        return;
+      }
+      
+      // Verificar credenciais no Firestore
+      db.collection('registrations').doc(email).get()
+        .then((doc) => {
+          if (doc.exists) {
+            const data = doc.data();
+            
+            // Verificar se a senha está correta
+            const passwordHash = btoa(password);
+            
+            if (data.passwordHash === passwordHash) {
+              if (data.status === 'approved') {
+                showPortalPage(data.name, data.email);
+              } else {
+                showMessage('Seu cadastro ainda não foi aprovado.', 'error');
+                showStatus(data.status);
+              }
+            } else {
+              showMessage('Senha incorreta.', 'error');
+            }
+          } else {
+            showMessage('Email não encontrado. Faça seu cadastro primeiro.', 'error');
+          }
+        })
+        .catch((error) => {
+          console.error('Erro ao fazer login:', error);
+          showMessage('Erro ao fazer login. Tente novamente.', 'error');
+        });
+    });
+    
+    // Login de administrador
+    adminLoginBtn.addEventListener('click', () => {
+      const password = adminPasswordInput.value.trim();
+      
+      if (password === ADMIN_PASSWORD) {
+        adminPanel.classList.remove('hidden');
+        loadPendingRegistrations();
+        loadApprovedUsers();
+      } else {
+        showMessage('Senha de administrador incorreta.', 'error');
+      }
+    });
+    
+    // Carregar solicitações pendentes
+    function loadPendingRegistrations() {
+      pendingList.innerHTML = '';
+      
+      db.collection('registrations').where('status', '==', 'pending').get()
+        .then((querySnapshot) => {
+          if (querySnapshot.empty) {
+            pendingList.innerHTML = '<p>Nenhuma solicitação pendente.</p>';
+            return;
+          }
+          
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const item = document.createElement('div');
+            item.className = 'admin-item';
+            item.innerHTML = `
+              <div>
+                <div><strong>${data.name}</strong> - ${data.instrument}</div>
+                <div>${data.email}</div>
+              </div>
+              <div>
+                <button class="approve-btn" data-email="${data.email}">Aprovar</button>
+                <button class="reject-btn" data-email="${data.email}">Rejeitar</button>
+              </div>
+            `;
+            pendingList.appendChild(item);
+          });
+          
+          // Adicionar event listeners aos botões
+          document.querySelectorAll('.approve-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+              const email = e.target.getAttribute('data-email');
+              updateRegistrationStatus(email, 'approved');
+            });
+          });
+          
+          document.querySelectorAll('.reject-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+              const email = e.target.getAttribute('data-email');
+              updateRegistrationStatus(email, 'rejected');
+            });
+          });
+        })
+        .catch((error) => {
+          console.error('Erro ao carregar solicitações:', error);
+        });
+    }
+    
+    // Carregar usuários aprovados
+    function loadApprovedUsers() {
+      approvedList.innerHTML = '';
+      
+      db.collection('registrations').where('status', '==', 'approved').get()
+        .then((querySnapshot) => {
+          if (querySnapshot.empty) {
+            approvedList.innerHTML = '<p>Nenhum usuário aprovado ainda.</p>';
+            return;
+          }
+          
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const item = document.createElement('div');
+            item.className = 'admin-item';
+            item.innerHTML = `
+              <div>
+                <div><strong>${data.name}</strong> - ${data.instrument}</div>
+                <div>${data.email}</div>
+              </div>
+              <button class="revoke-btn" data-email="${data.email}">Revogar Acesso</button>
+            `;
+            approvedList.appendChild(item);
+          });
+          
+          // Adicionar event listeners aos botões de revogar
+          document.querySelectorAll('.revoke-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+              const email = e.target.getAttribute('data-email');
+              updateRegistrationStatus(email, 'rejected');
+            });
+          });
+        })
+        .catch((error) => {
+          console.error('Erro ao carregar usuários aprovados:', error);
+        });
+    }
+    
+    // Atualizar status do cadastro
+    function updateRegistrationStatus(email, status) {
+      db.collection('registrations').doc(email).update({
+        status: status,
+        reviewedAt: new Date()
+      })
+      .then(() => {
+        showMessage(`Status atualizado para ${status === 'approved' ? 'aprovado' : 'rejeitado'}!`, 'success');
+        
+        // Recarregar as listas
+        loadPendingRegistrations();
+        loadApprovedUsers();
+      })
+      .catch((error) => {
+        console.error('Erro ao atualizar status:', error);
+        showMessage('Erro ao atualizar status. Tente novamente.', 'error');
+      });
+    }
+    
+    // Mostrar página do portal
+    function showPortalPage(name, email) {
+      registerPage.classList.add('hidden');
+      portalPage.classList.remove('hidden');
+      
+      // Exibir informações do usuário
+      userName.textContent = name;
+      
+      // Avatar padrão baseado na primeira letra do nome
+      const initials = name.charAt(0).toUpperCase();
+      userAvatar.src = `https://ui-avatars.com/api/?name=${initials}&background=dc2626&color=fff&size=45`;
+      
+      // Salvar email no localStorage
+      localStorage.setItem('villaMetalUserEmail', email);
+    }
+    
+    // Logout
+    logoutBtn.addEventListener('click', () => {
+      registerPage.classList.remove('hidden');
+      portalPage.classList.add('hidden');
+      
+      // Limpar campos de login
+      loginEmailInput.value = '';
+      loginPasswordInput.value = '';
+    });
+    
+    // Verificar se já existe um cadastro ao carregar a página
+    document.addEventListener('DOMContentLoaded', () => {
+      checkExistingRegistration();
+    });
+  </script>
+</body>
+</html>
