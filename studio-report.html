@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:url" content="https://villametal.github.io/villametal/studio-report">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="VILLA-METAL | Studio Report">
+    <meta property="og:description" content="Prática de conjunto de Metal da Escola de Música Villa Lobos">
+    <meta property="og:image" content="https://villametal.github.io/villametal/Logo Villa-Metal.png">   
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="https://villametal.github.io/villametal/">
+    <meta property="twitter:url" content="https://villametal.github.io/villametal/studio-report">
+    <meta name="twitter:title" content="VILLA-METAL | Studio Report">
+    <meta name="twitter:description" content="Prática de conjunto de Metal da Escola de Música Villa Lobos">
+    <meta name="twitter:image" content="https://villametal.github.io/villametal/Logo Villa-Metal.png">
+    <title>VILLA-METAL | Studio Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
+
+        .backstage-button {
+            background: linear-gradient(45deg, #dc2626, #f59e0b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: absolute;
+            right: 30px; top: 30px;
+            font-size: 18px;
+            background-color: linear-gradient(90deg, #0f0c29, #302b63, #24243e);
+            padding: 2px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px #dc2626;
+        }
+
+        .backstage-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 30px rgba(220, 38, 38);
+        }
+
+        .header-scrolled .backstage-button {
+            font-size: 17px;
+            right: 20px; top: 20px;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+        .video-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        header {
+                transition: all 0.3s ease;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+        
+        .header-scrolled {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        
+        .header-scrolled .logo-container img {
+            width: 120px !important;
+        }
+        
+        .header-scrolled .logo-container p {
+            display: none !important;
+        }
+        
+        @media (max-width: 768px) {
+            .header-scrolled nav li span {
+                display: none !important;
+            }
+            .backstage-button {
+            position: static;
+            font-size: 12px;
+            background-color: linear-gradient(90deg, #0f0c29, #302b63, #24243e);
+            }
+            .header-scrolled .backstage-button {
+            font-size: 12px;
+            box-shadow: 0 1px 10px #dc2626;       
+        }       
+        }
+
+        .ring{
+            position: absolute;
+            margin: 15px 60px;
+            width: 60px;
+            height: 150px;
+            border-radius: 50%;
+            animation: ring 2s linear infinite;
+            }
+        @keyframes ring {
+            0%{
+                transform: rotate(0deg);
+                box-shadow: 1px 8px 7px #005ce6;
+            }
+            50%{
+                transform: rotate(180deg);
+                box-shadow: 1px 8px 7px #01b26e;
+            }
+            100%{
+                transform: rotate(360deg);
+                box-shadow: 1px 8px 7px #04c8c8;
+            }
+            }
+        .ring:before{
+            position: absolute;
+            content: '';
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            border-radius: 50%;
+            }
+        .ringspan{
+            display: flex;
+            justify-content: center;
+            color: #ffffff;
+            font-size:35px;
+            font-weight: bolder;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 200px;
+            animation: text 3s ease-in-out infinite;
+            }
+        @keyframes text {
+            50%{
+                color: black;
+            }
+            }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-gray-100">
+  
+    <header class="bg-black/80 backdrop-blur-md shadow-lg" id="mainHeader">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+              <div class="flex items-center mb-2 md:mb-0 logo-container">
+                    <span class="text-red-500 text-3xl mr-3"></span>
+                    <a href="https://villametal.github.io/villametal">
+                    <h1 class="w-36 md:w-52 transition-all duration-300">
+                        <img src="Logo_Villa-Metal transparent.png" alt="">
+                    </h1>
+                </a>
+                </div>
+                
+                <nav class="w-full md:w-auto">
+                    <ul class="flex flex-wrap justify-center md:justify-end space-x-1 md:space-x-4">
+                        <li>
+                            <a href="index.html" class="px-2 py-1 md:px-3 md:py-2 rounded-md bg-gray-800 text-red-400 font-medium flex items-center text-sm md:text-base">
+                                <i class="fas fa-home mr-1 md:mr-2"></i>
+                                <span>Home</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="lineup.html" class="px-2 py-1 md:px-3 md:py-2 rounded-md hover:bg-gray-800 transition flex items-center text-sm md:text-base">
+                                <i class="fas fa-users mr-1 md:mr-2 text-red-500"></i>
+                                <span>Line-up</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="studio-report.html" class="px-2 py-1 md:px-3 md:py-2 rounded-md hover:bg-gray-800 transition flex items-center text-sm md:text-base">
+                                <i class="fas fa-headphones mr-1 md:mr-2 text-red-500"></i>
+                                <span>Studio Report</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <button class="backstage-button w-full md:w-auto"><a href="backstagelogin.html"><span><i class="fas fa-door-closed"></i>Backstage</span></a></button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <section class="max-w-6xl mx-auto">
+            <div class="text-center mb-8 md:mb-12">
+                <h2 class="text-2xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-red-500 to-yellow-500 bg-clip-text text-transparent">
+                    STUDIO REPORT
+                </h2>
+                <p class="text-gray-300 max-w-2xl mx-auto">Registros dos ensaios e gravações em estúdio</p>
+            </div>
+
+     
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+            
+                <div class="video-card bg-gray-800/50 rounded-lg overflow-hidden border border-gray-700">
+                    <div class="video-container">
+                        <div class="ring"></div><div class="ring py-36"></div>
+                        <span class="ringspan">Loading...</span>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold text-red-400 mb-2">Villa-Metal - Studio Report #4</h3>
+                        <p class="text-gray-300 text-sm hidden md:hidden">Alguns momentos do ensaio do segundo, com as músicas "I Am The Fire" (Halestorm) e "Duality" (Slipknot).
+                            <br>
+                            I Am The Fire: Bia - Vocal / Bru - Guitarra / Jonas - Bateria
+                            <br>
+                            Duality: Chico - Vocal / Bru - Guitarra / Jonas - Bateria</p>
+                    </div>
+                </div>
+
+         
+                <div class="video-card bg-gray-800/50 rounded-lg overflow-hidden border border-gray-700">
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/f8tprYaomiA?si=7V98bjXRTb5zgdtl" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold text-red-400 mb-2">Villa-Metal - Studio Report #3</h3>
+                        <p class="text-gray-300 text-sm">Registros de um mega ensaio com as músicas "War Pigs" (Black Sabbath), "Symphony Of Destruction" (Megadeth), "As I Am" (Dream Theater) e "I Am The Fire" (Halestorm). Brabo!🤘
+                        <br>
+                        War Pigs e Symphony of Destruction: Chico - Vocal / Wendell - Guitarra / Ítalo - Guitarra / Apocah - Baixo / Jonas - Bateria
+                        <br>
+                        As I Am: Chico - Vocal / Bru - Guitarra / Apocah - Baixo
+                        <br>
+                        I Am The Fire: Bia - Vocal / Bru - Guitarra / Jonas - Bateria
+                    </div>
+                </div>
+
+         
+                <div class="video-card bg-gray-800/50 rounded-lg overflow-hidden border border-gray-700">
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/32_Sl7TZdvM?si=X3YAnsUWJR1dR-Ju" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold text-red-400 mb-2">Villa-Metal - Studio Report #2</h3>
+                        <p class="text-gray-300 text-sm">Alguns momentos do segundo ensaio, com as músicas "I Am The Fire" (Halestorm) e "Duality" (Slipknot).
+                            <br>
+                            I Am The Fire: Bia - Vocal / Bru - Guitarra / Jonas - Bateria
+                            <br>
+                            Duality: Chico - Vocal / Bru - Guitarra / Jonas - Bateria</p>
+                    </div>
+                </div>
+
+            
+                <div class="video-card bg-gray-800/50 rounded-lg overflow-hidden border border-gray-700">
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/VwC596qDRn4?si=Lr28OTm3N52GwM31" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold text-red-400 mb-2">Villa-Metal - Studio Report #1</h3>
+                        <p class="text-gray-300 text-sm">Registros do primeiro ensaio, desenvolvendo a execução das músicas "Love Bites" (Halestorm) e "Symphony of Destruction" (Megadeth).
+                            <br>
+                            Love Bites: Bia - Vocal / Bru - Guitarra / Jonas - Bateria
+                            <br>
+                            Symphony of Destruction: Chico - Vocal / Wendell - Guitarra / Nathan - Guitarra / Cauã - Baixo / Jonas - Bateria</p>
+                    </div>
+                </div>
+                
+ 
+        </section>
+    </main>
+
+    <footer class="bg-black/80 mt-28 md:mt-12 py-1 md:py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-1 md:mb-0 text-center md:text-left">
+                    <h2 class="text-sm md:text-2xl font-bold bg-gradient-to-r from-red-500 to-yellow-500 bg-clip-text text-transparent">
+                        VILLA-METAL
+                    </h2>
+                    <p class="text-gray-400 mt-1 text-sm md:text-base">Prática de conjunto de Metal da Escola de Música Villa-Lobos</p>
+                </div>
+                
+                <div class="flex space-x-4 md:space-x-6">
+                    <a href="https://www.instagram.com/villametal.emvl" target="_blank" class="text-gray-400 hover:text-red-500 transition">
+                        <i class="fab fa-instagram text-lg md:text-xl"></i>
+                    </a>
+                    <a href="https://www.youtube.com/@villametalemvl" target="_blank" class="text-gray-400 hover:text-red-500 transition">
+                        <i class="fab fa-youtube text-lg md:text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-1 md:mt-6 pt-1 md:pt-6 text-center text-gray-500 text-xs md:text-sm">
+                <p>© 2025 todos os direitos reservados - <a href="https://wa.me/5521989978029" class="text-red-400 hover:text-red-300 transition" target="_blank">Bru Cardoso Coder</a></p>
+            </div>
+        </div>
+    </footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {            
+            // Extrair ID do YouTube para embed (exemplo de função)
+            function getYouTubeId(url) {
+                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                const match = url.match(regExp);
+                return (match && match[2].length === 11) ? match[2] : null;
+            }
+        });
+        // Efeito de scroll no header
+        const header = document.getElementById('mainHeader');
+        
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
+        });
+    </script>
+</body>
+</html>
