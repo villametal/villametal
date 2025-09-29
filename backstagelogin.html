@@ -538,7 +538,7 @@
             <p>Acesse as músicas em estudo, partituras, tabs e materiais de apoio para ensaio.</p>
           </div>
           
-          <div class="card">
+          <!-- <div class="card">
             <h4><i class="fas fa-bullhorn"></i> Comunicados</h4>
             <p>Fique por dentro dos avisos, novidades e eventos da Villa-Metal.</p>
           </div>
@@ -546,7 +546,7 @@
           <div class="card">
             <h4><i class="fas fa-calendar-alt"></i> Agenda</h4>
             <p>Confira os próximos ensaios, apresentações e eventos programados.</p>
-          </div>
+          </div> -->
 
           <div class="card">
             <h4><i class="fas fa-video"></i> Studio Reports</h4>
@@ -580,69 +580,39 @@
       appId: "1:622030637005:web:5d2e5203a64f4cc35ba684"
     };
     
-    // Inicializar Firebase
-    firebase.initializeApp(firebaseConfig);
+    // Inicializar Firebase com tratamento de erro
+    try {
+        firebase.initializeApp(firebaseConfig);
+        console.log("Firebase inicializado com sucesso!");
+    } catch (error) {
+        console.error("Erro ao inicializar Firebase:", error);
+        alert("Erro de configuração do Firebase. Verifique o console para detalhes.");
+    }
+    
     const db = firebase.firestore();
     
     // Elementos da DOM
     const registerPage = document.getElementById('register-page');
-    const portalPage = document.getElementById('portal-page');
     const nameInput = document.getElementById('name');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     const instrumentInput = document.getElementById('instrument');
     const registerBtn = document.getElementById('register-btn');
-    const loginEmailInput = document.getElementById('login-email');
-    const loginPasswordInput = document.getElementById('login-password');
-    const loginBtn = document.getElementById('login-btn');
-    const adminPasswordInput = document.getElementById('admin-password');
-    const adminLoginBtn = document.getElementById('admin-login');
-    const adminPanel = document.getElementById('admin-panel');
-    const pendingList = document.getElementById('pending-list');
-    const approvedList = document.getElementById('approved-list');
-    const logoutBtn = document.getElementById('logout-btn');
-    const userName = document.getElementById('user-name');
-    const userAvatar = document.getElementById('user-avatar');
     const messageDiv = document.getElementById('message');
     const statusSection = document.getElementById('status-section');
     const statusMessage = document.getElementById('status-message');
     
-    // Senha de administrador
-    const ADMIN_PASSWORD = "villalobosmetaleiro";
-    
-    // Verificar se já existe um cadastro para este navegador
-    function checkExistingRegistration() {
-      const userEmail = localStorage.getItem('villaMetalUserEmail');
-      if (userEmail) {
-        db.collection('registrations').doc(userEmail).get()
-          .then((doc) => {
-            if (doc.exists) {
-              const data = doc.data();
-              showStatus(data.status);
-              
-              // Se já estiver aprovado, preencher o email para login
-              if (data.status === 'approved') {
-                loginEmailInput.value = userEmail;
-              }
-            }
-          });
-      }
-    }
-    
-    // Mostrar status do cadastro
-    function showStatus(status) {
-      statusSection.classList.remove('hidden');
-      
-      if (status === 'pending') {
-        statusMessage.textContent = 'Seu cadastro está em análise. Aguarde a aprovação.';
-        statusSection.className = 'status-section pending';
-      } else if (status === 'approved') {
-        statusMessage.textContent = 'Seu cadastro foi aprovado! Você já pode acessar a área restrita.';
-        statusSection.className = 'status-section success';
-      } else if (status === 'rejected') {
-        statusMessage.textContent = 'Seu cadastro não foi aprovado. Entre em contato para mais informações.';
-        statusSection.className = 'status-section error';
-      }
+    // Função para testar a conexão com o Firebase
+    async function testFirebaseConnection() {
+        try {
+            const testDocRef = db.collection('test').doc('connectionTest');
+            await testDocRef.set({ test: true, timestamp: new Date() });
+            console.log("Conexão com Firebase bem-sucedida!");
+            return true;
+        } catch (error) {
+            console.error("Falha na conexão com Firebase:", error);
+            return false;
+        }
     }
     
     // Mostrar mensagem
@@ -656,249 +626,85 @@
       }, 5000);
     }
     
-    // Solicitar cadastro - CORREÇÃO AQUI
-    registerBtn.addEventListener('click', () => {
-      const name = nameInput.value.trim();
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
-      const instrument = instrumentInput.value;
-      
-      // CORREÇÃO: Removida a verificação dos campos comentados
-      if (!name || !email || !password || !instrument) {
-        showMessage('Por favor, preencha todos os campos.', 'error');
-        return;
-      }
-      
-      if (password.length < 6) {
-        showMessage('A senha deve ter pelo menos 6 caracteres.', 'error');
-        return;
-      }
-      
-      // Verificar se o email já está cadastrado
-      db.collection('registrations').doc(email).get()
-        .then((doc) => {
-          if (doc.exists) {
-            showMessage('Este email já está cadastrado.', 'error');
-            return;
-          }
-          
-          // Salvar solicitação de cadastro (com hash da senha)
-          const passwordHash = btoa(password);
-          
-          return db.collection('registrations').doc(email).set({
-            name: name,
-            email: email,
-            passwordHash: passwordHash,
-            instrument: instrument,
-            status: 'pending',
-            requestedAt: new Date()
-          });
-        })
-        .then(() => {
-          showMessage('Solicitação enviada com sucesso! Aguarde a aprovação.', 'success');
-          showStatus('pending');
-          
-          // Limpar formulário
-          nameInput.value = '';
-          emailInput.value = '';
-          passwordInput.value = '';
-          instrumentInput.value = '';
-          
-          // Salvar email no localStorage para verificar status posteriormente
-          localStorage.setItem('villaMetalUserEmail', email);
-        })
-        .catch((error) => {
-          console.error('Erro ao enviar solicitação:', error);
-          showMessage('Erro ao enviar solicitação. Tente novamente.', 'error');
-        });
-    });
-    
-    // Login de usuário
-    loginBtn.addEventListener('click', () => {
-      const email = loginEmailInput.value.trim();
-      const password = loginPasswordInput.value;
-      
-      if (!email || !password) {
-        showMessage('Por favor, informe email e senha.', 'error');
-        return;
-      }
-      
-      // Verificar credenciais no Firestore
-      db.collection('registrations').doc(email).get()
-        .then((doc) => {
-          if (doc.exists) {
-            const data = doc.data();
-            
-            // Verificar se a senha está correta
-            const passwordHash = btoa(password);
-            
-            if (data.passwordHash === passwordHash) {
-              if (data.status === 'approved') {
-                showPortalPage(data.name, data.email);
-              } else {
-                showMessage('Seu cadastro ainda não foi aprovado.', 'error');
-                showStatus(data.status);
-              }
-            } else {
-              showMessage('Senha incorreta.', 'error');
-            }
-          } else {
-            showMessage('Email não encontrado. Faça seu cadastro primeiro.', 'error');
-          }
-        })
-        .catch((error) => {
-          console.error('Erro ao fazer login:', error);
-          showMessage('Erro ao fazer login. Tente novamente.', 'error');
-        });
-    });
-    
-    // Login de administrador
-    adminLoginBtn.addEventListener('click', () => {
-      const password = adminPasswordInput.value.trim();
-      
-      if (password === ADMIN_PASSWORD) {
-        adminPanel.classList.remove('hidden');
-        loadPendingRegistrations();
-        loadApprovedUsers();
-      } else {
-        showMessage('Senha de administrador incorreta.', 'error');
-      }
-    });
-    
-    // Carregar solicitações pendentes
-    function loadPendingRegistrations() {
-      pendingList.innerHTML = '';
-      
-      db.collection('registrations').where('status', '==', 'pending').get()
-        .then((querySnapshot) => {
-          if (querySnapshot.empty) {
-            pendingList.innerHTML = '<p>Nenhuma solicitação pendente.</p>';
-            return;
-          }
-          
-          querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const item = document.createElement('div');
-            item.className = 'admin-item';
-            item.innerHTML = `
-              <div>
-                <div><strong>${data.name}</strong> - ${data.instrument}</div>
-                <div>${data.email}</div>
-              </div>
-              <div>
-                <button class="approve-btn" data-email="${data.email}">Aprovar</button>
-                <button class="reject-btn" data-email="${data.email}">Rejeitar</button>
-              </div>
-            `;
-            pendingList.appendChild(item);
-          });
-          
-          // Adicionar event listeners aos botões
-          document.querySelectorAll('.approve-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-              const email = e.target.getAttribute('data-email');
-              updateRegistrationStatus(email, 'approved');
-            });
-          });
-          
-          document.querySelectorAll('.reject-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-              const email = e.target.getAttribute('data-email');
-              updateRegistrationStatus(email, 'rejected');
-            });
-          });
-        })
-        .catch((error) => {
-          console.error('Erro ao carregar solicitações:', error);
-        });
-    }
-    
-    // Carregar usuários aprovados
-    function loadApprovedUsers() {
-      approvedList.innerHTML = '';
-      
-      db.collection('registrations').where('status', '==', 'approved').get()
-        .then((querySnapshot) => {
-          if (querySnapshot.empty) {
-            approvedList.innerHTML = '<p>Nenhum usuário aprovado ainda.</p>';
-            return;
-          }
-          
-          querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const item = document.createElement('div');
-            item.className = 'admin-item';
-            item.innerHTML = `
-              <div>
-                <div><strong>${data.name}</strong> - ${data.instrument}</div>
-                <div>${data.email}</div>
-              </div>
-              <button class="revoke-btn" data-email="${data.email}">Revogar Acesso</button>
-            `;
-            approvedList.appendChild(item);
-          });
-          
-          // Adicionar event listeners aos botões de revogar
-          document.querySelectorAll('.revoke-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-              const email = e.target.getAttribute('data-email');
-              updateRegistrationStatus(email, 'rejected');
-            });
-          });
-        })
-        .catch((error) => {
-          console.error('Erro ao carregar usuários aprovados:', error);
-        });
-    }
-    
-    // Atualizar status do cadastro
-    function updateRegistrationStatus(email, status) {
-      db.collection('registrations').doc(email).update({
-        status: status,
-        reviewedAt: new Date()
-      })
-      .then(() => {
-        showMessage(`Status atualizado para ${status === 'approved' ? 'aprovado' : 'rejeitado'}!`, 'success');
+    // Solicitar cadastro - Versão corrigida
+    registerBtn.addEventListener('click', async () => {
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+        const instrument = instrumentInput.value;
         
-        // Recarregar as listas
-        loadPendingRegistrations();
-        loadApprovedUsers();
-      })
-      .catch((error) => {
-        console.error('Erro ao atualizar status:', error);
-        showMessage('Erro ao atualizar status. Tente novamente.', 'error');
-      });
-    }
-    
-    // Mostrar página do portal
-    function showPortalPage(name, email) {
-      registerPage.classList.add('hidden');
-      portalPage.classList.remove('hidden');
-      
-      // Exibir informações do usuário
-      userName.textContent = name;
-      
-      // Avatar padrão baseado na primeira letra do nome
-      const initials = name.charAt(0).toUpperCase();
-      userAvatar.src = `https://ui-avatars.com/api/?name=${initials}&background=dc2626&color=fff&size=45`;
-      
-      // Salvar email no localStorage
-      localStorage.setItem('villaMetalUserEmail', email);
-    }
-    
-    // Logout
-    logoutBtn.addEventListener('click', () => {
-      registerPage.classList.remove('hidden');
-      portalPage.classList.add('hidden');
-      
-      // Limpar campos de login
-      loginEmailInput.value = '';
-      loginPasswordInput.value = '';
+        if (!name || !email || !password || !instrument) {
+            showMessage('Por favor, preencha todos os campos.', 'error');
+            return;
+        }
+        
+        if (password.length < 6) {
+            showMessage('A senha deve ter pelo menos 6 caracteres.', 'error');
+            return;
+        }
+        
+        // Desabilitar botão durante o processamento
+        registerBtn.disabled = true;
+        registerBtn.textContent = 'Enviando...';
+        
+        try {
+            // Verificar se o email já está cadastrado
+            const doc = await db.collection('registrations').doc(email).get();
+            
+            if (doc.exists) {
+                showMessage('Este email já está cadastrado.', 'error');
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Solicitar Acesso';
+                return;
+            }
+            
+            // Salvar solicitação de cadastro
+            await db.collection('registrations').doc(email).set({
+                name: name,
+                email: email,
+                passwordHash: btoa(password),
+                instrument: instrument,
+                status: 'pending',
+                requestedAt: new Date(),
+                phone: '',
+                experience: ''
+            });
+            
+            showMessage('Solicitação enviada com sucesso! Aguarde a aprovação.', 'success');
+            
+            // Limpar formulário
+            nameInput.value = '';
+            emailInput.value = '';
+            passwordInput.value = '';
+            instrumentInput.value = '';
+            
+            // Salvar email no localStorage
+            localStorage.setItem('villaMetalUserEmail', email);
+            
+        } catch (error) {
+            console.error('Erro detalhado:', error);
+            
+            // Mensagens de erro mais específicas
+            if (error.code === 'permission-denied') {
+                showMessage('Erro de permissão. Verifique as regras do Firestore.', 'error');
+            } else if (error.code === 'unavailable') {
+                showMessage('Erro de conexão. Verifique sua internet.', 'error');
+            } else {
+                showMessage('Erro ao enviar solicitação: ' + error.message, 'error');
+            }
+        } finally {
+            // Reabilitar botão
+            registerBtn.disabled = false;
+            registerBtn.textContent = 'Solicitar Acesso';
+        }
     });
     
-    // Verificar se já existe um cadastro ao carregar a página
-    document.addEventListener('DOMContentLoaded', () => {
-      checkExistingRegistration();
+    // Executar teste de conexão quando a página carregar
+    document.addEventListener('DOMContentLoaded', async () => {
+        const isConnected = await testFirebaseConnection();
+        if (!isConnected) {
+            showMessage('Erro de conexão com o servidor. Tente novamente mais tarde.', 'error');
+        }
     });
   </script>
 </body>
