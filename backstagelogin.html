@@ -206,10 +206,39 @@
       font-size: 14px;
       background: #dc2626;
       margin-left: 10px;
+      margin-top: 0;
     }
     
     .admin-item .approve-btn {
       background: #16a34a;
+    }
+    
+    .admin-item .reject-btn {
+      background: #dc2626;
+    }
+    
+    .admin-item .remove-btn {
+      background: #dc2626;
+    }
+    
+    .admin-user-info {
+      flex-grow: 1;
+    }
+    
+    .admin-user-info .user-name {
+      font-weight: bold;
+      color: #f1f5f9;
+    }
+    
+    .admin-user-info .user-details {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+    
+    .admin-actions {
+      display: flex;
+      gap: 5px;
     }
     
     .hidden {
@@ -378,6 +407,11 @@
       font-size: 25px;
     }
     
+    .admin-logout {
+      background: linear-gradient(45deg, #6b7280, #9ca3af);
+      margin-top: 15px;
+    }
+    
     @media (max-width: 768px) {
       .container, .portal-container {
         width: 100%;
@@ -402,6 +436,11 @@
       .admin-item button {
         width: 100%;
         margin-left: 0;
+      }
+      
+      .admin-actions {
+        width: 100%;
+        justify-content: center;
       }
     }
   </style>
@@ -489,6 +528,10 @@
         <div class="admin-section">
           <h3><i class="fas fa-user-shield"></i> Área do Administrador</h3>
           <div class="input-group">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="admin-email" placeholder="Email do administrador" required>
+          </div>
+          <div class="input-group">
             <i class="fas fa-key"></i>
             <input type="password" id="admin-password" placeholder="Senha de administrador" required>
           </div>
@@ -504,6 +547,8 @@
             <div class="admin-list" id="approved-list">
               <!-- Lista de usuários aprovados será preenchida aqui -->
             </div>
+            
+            <button id="admin-logout" class="admin-logout">Sair do Painel Admin</button>
           </div>
         </div>
       </div>
@@ -595,6 +640,29 @@
     const statusSection = document.getElementById('status-section');
     const statusMessage = document.getElementById('status-message');
     
+    // Elementos da área administrativa
+    const adminEmailInput = document.getElementById('admin-email');
+    const adminPasswordInput = document.getElementById('admin-password');
+    const adminLoginBtn = document.getElementById('admin-login');
+    const adminPanel = document.getElementById('admin-panel');
+    const pendingList = document.getElementById('pending-list');
+    const approvedList = document.getElementById('approved-list');
+    const adminLogoutBtn = document.getElementById('admin-logout');
+    
+    // Estado da sessão administrativa
+    let isAdminLoggedIn = false;
+    
+    // Função para criar hash simples (em produção, use uma biblioteca mais robusta)
+    function simpleHash(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+        return Math.abs(hash).toString(36);
+    }
+    
     // Mostrar mensagem
     function showMessage(text, type) {
       messageDiv.textContent = text;
@@ -606,20 +674,269 @@
       }, 5000);
     }
     
-    // Função para verificar se o Firebase está funcionando (versão simplificada)
+    // Função para verificar se o Firebase está funcionando
     async function checkFirebaseStatus() {
         if (!firebaseInitialized) {
             return false;
         }
         
         try {
-            // Teste simples de leitura ao invés de escrita
             await db.collection('registrations').limit(1).get();
             return true;
         } catch (error) {
             console.error("Erro ao verificar status do Firebase:", error);
             return false;
         }
+    }
+    
+    // Inicializar administrador padrão (executar apenas uma vez)
+    async function initializeDefaultAdmin() {
+        try {
+            const adminEmail = "villametal.emvl@gmail.com";
+            const adminPassword = "admin123"; // SENHA TEMPORÁRIA - ALTERE DEPOIS!
+            
+            const adminDoc = await db.collection('admins').doc(adminEmail).get();
+            
+            if (!adminDoc.exists) {
+                await db.collection('admins').doc(adminEmail).set({
+                    email: adminEmail,
+                    passwordHash: simpleHash(adminPassword),
+                    name: "Administrador Villa Metal",
+                    role: "admin",
+                    createdAt: new Date(),
+                    lastLogin: null
+                });
+                console.log("Administrador padrão criado com sucesso!");
+            }
+        } catch (error) {
+            console.error("Erro ao inicializar administrador:", error);
+        }
+    }
+    
+    // Login administrativo
+    adminLoginBtn.addEventListener('click', async () => {
+        const email = adminEmailInput.value.trim();
+        const password = adminPasswordInput.value;
+        
+        if (!email || !password) {
+            showMessage('Por favor, preencha email e senha do administrador.', 'error');
+            return;
+        }
+        
+        if (!firebaseInitialized) {
+            showMessage('Sistema temporariamente indisponível.', 'error');
+            return;
+        }
+        
+        adminLoginBtn.disabled = true;
+        adminLoginBtn.textContent = 'Verificando...';
+        
+        try {
+            const adminDoc = await db.collection('admins').doc(email).get();
+            
+            if (!adminDoc.exists) {
+                showMessage('Credenciais de administrador inválidas.', 'error');
+                adminLoginBtn.disabled = false;
+                adminLoginBtn.textContent = 'Acessar Painel Admin';
+                return;
+            }
+            
+            const adminData = adminDoc.data();
+            const passwordHash = simpleHash(password);
+            
+            if (adminData.passwordHash !== passwordHash) {
+                showMessage('Credenciais de administrador inválidas.', 'error');
+                adminLoginBtn.disabled = false;
+                adminLoginBtn.textContent = 'Acessar Painel Admin';
+                return;
+            }
+            
+            // Login bem-sucedido
+            isAdminLoggedIn = true;
+            adminPanel.classList.remove('hidden');
+            showMessage('Login administrativo realizado com sucesso!', 'success');
+            
+            // Atualizar último login
+            await db.collection('admins').doc(email).update({
+                lastLogin: new Date()
+            });
+            
+            // Carregar dados do painel
+            await loadAdminData();
+            
+        } catch (error) {
+            console.error('Erro no login administrativo:', error);
+            showMessage('Erro ao fazer login. Tente novamente.', 'error');
+        } finally {
+            adminLoginBtn.disabled = false;
+            adminLoginBtn.textContent = 'Acessar Painel Admin';
+        }
+    });
+    
+    // Logout administrativo
+    adminLogoutBtn.addEventListener('click', () => {
+        isAdminLoggedIn = false;
+        adminPanel.classList.add('hidden');
+        adminEmailInput.value = '';
+        adminPasswordInput.value = '';
+        showMessage('Logout administrativo realizado.', 'success');
+    });
+    
+    // Carregar dados do painel administrativo
+    async function loadAdminData() {
+        if (!isAdminLoggedIn) return;
+        
+        try {
+            // Carregar solicitações pendentes
+            const pendingQuery = await db.collection('registrations')
+                .where('status', '==', 'pending')
+                .orderBy('requestedAt', 'desc')
+                .get();
+            
+            pendingList.innerHTML = '';
+            pendingQuery.forEach(doc => {
+                const data = doc.data();
+                const item = createAdminItem(doc.id, data, 'pending');
+                pendingList.appendChild(item);
+            });
+            
+            if (pendingQuery.empty) {
+                pendingList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Nenhuma solicitação pendente.</p>';
+            }
+            
+            // Carregar usuários aprovados
+            const approvedQuery = await db.collection('registrations')
+                .where('status', '==', 'approved')
+                .orderBy('requestedAt', 'desc')
+                .get();
+            
+            approvedList.innerHTML = '';
+            approvedQuery.forEach(doc => {
+                const data = doc.data();
+                const item = createAdminItem(doc.id, data, 'approved');
+                approvedList.appendChild(item);
+            });
+            
+            if (approvedQuery.empty) {
+                approvedList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Nenhum usuário aprovado.</p>';
+            }
+            
+        } catch (error) {
+            console.error('Erro ao carregar dados administrativos:', error);
+            showMessage('Erro ao carregar dados do painel.', 'error');
+        }
+    }
+    
+    // Criar item da lista administrativa
+    function createAdminItem(docId, data, status) {
+        const item = document.createElement('div');
+        item.className = 'admin-item';
+        
+        const userInfo = document.createElement('div');
+        userInfo.className = 'admin-user-info';
+        
+        const userName = document.createElement('div');
+        userName.className = 'user-name';
+        userName.textContent = data.name;
+        
+        const userDetails = document.createElement('div');
+        userDetails.className = 'user-details';
+        userDetails.textContent = `${data.email} • ${data.instrument} • ${formatDate(data.requestedAt)}`;
+        
+        userInfo.appendChild(userName);
+        userInfo.appendChild(userDetails);
+        
+        const actions = document.createElement('div');
+        actions.className = 'admin-actions';
+        
+        if (status === 'pending') {
+            const approveBtn = document.createElement('button');
+            approveBtn.className = 'approve-btn';
+            approveBtn.textContent = 'Aprovar';
+            approveBtn.onclick = () => approveUser(docId, data);
+            
+            const rejectBtn = document.createElement('button');
+            rejectBtn.className = 'reject-btn';
+            rejectBtn.textContent = 'Rejeitar';
+            rejectBtn.onclick = () => rejectUser(docId, data);
+            
+            actions.appendChild(approveBtn);
+            actions.appendChild(rejectBtn);
+        } else if (status === 'approved') {
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-btn';
+            removeBtn.textContent = 'Remover';
+            removeBtn.onclick = () => removeUser(docId, data);
+            
+            actions.appendChild(removeBtn);
+        }
+        
+        item.appendChild(userInfo);
+        item.appendChild(actions);
+        
+        return item;
+    }
+    
+    // Aprovar usuário
+    async function approveUser(docId, userData) {
+        if (!confirm(`Aprovar acesso para ${userData.name}?`)) return;
+        
+        try {
+            await db.collection('registrations').doc(docId).update({
+                status: 'approved',
+                approvedAt: new Date()
+            });
+            
+            showMessage(`Usuário ${userData.name} aprovado com sucesso!`, 'success');
+            await loadAdminData();
+        } catch (error) {
+            console.error('Erro ao aprovar usuário:', error);
+            showMessage('Erro ao aprovar usuário.', 'error');
+        }
+    }
+    
+    // Rejeitar usuário
+    async function rejectUser(docId, userData) {
+        if (!confirm(`Rejeitar solicitação de ${userData.name}?`)) return;
+        
+        try {
+            await db.collection('registrations').doc(docId).update({
+                status: 'rejected',
+                rejectedAt: new Date()
+            });
+            
+            showMessage(`Solicitação de ${userData.name} rejeitada.`, 'success');
+            await loadAdminData();
+        } catch (error) {
+            console.error('Erro ao rejeitar usuário:', error);
+            showMessage('Erro ao rejeitar usuário.', 'error');
+        }
+    }
+    
+    // Remover usuário
+    async function removeUser(docId, userData) {
+        if (!confirm(`Remover usuário ${userData.name}? Esta ação não pode ser desfeita.`)) return;
+        
+        try {
+            await db.collection('registrations').doc(docId).delete();
+            
+            showMessage(`Usuário ${userData.name} removido.`, 'success');
+            await loadAdminData();
+        } catch (error) {
+            console.error('Erro ao remover usuário:', error);
+            showMessage('Erro ao remover usuário.', 'error');
+        }
+    }
+    
+    // Formatar data
+    function formatDate(timestamp) {
+        if (!timestamp) return 'Data não disponível';
+        
+        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        return date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
     }
     
     // Solicitar cadastro - Versão corrigida com melhor tratamento de erros
@@ -702,18 +1019,16 @@
         }
     });
     
-    // Remover o teste de conexão automático que causava o erro inicial
-    // A verificação agora é feita apenas quando necessário
-    
-    // Verificar status quando a página carregar (sem mostrar erro)
+    // Verificar status quando a página carregar
     document.addEventListener('DOMContentLoaded', async () => {
         const isWorking = await checkFirebaseStatus();
-        if (!isWorking) {
+        if (isWorking) {
+            // Inicializar administrador padrão se necessário
+            await initializeDefaultAdmin();
+        } else {
             console.log('Firebase não está totalmente configurado ainda');
-            // Não mostrar erro para o usuário na inicialização
         }
     });
   </script>
 </body>
 </html>
-
