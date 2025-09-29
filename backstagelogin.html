@@ -538,16 +538,6 @@
             <p>Acesse as músicas em estudo, partituras, tabs e materiais de apoio para ensaio.</p>
           </div>
           
-          <!-- <div class="card">
-            <h4><i class="fas fa-bullhorn"></i> Comunicados</h4>
-            <p>Fique por dentro dos avisos, novidades e eventos da Villa-Metal.</p>
-          </div>
-          
-          <div class="card">
-            <h4><i class="fas fa-calendar-alt"></i> Agenda</h4>
-            <p>Confira os próximos ensaios, apresentações e eventos programados.</p>
-          </div> -->
-
           <div class="card">
             <h4><i class="fas fa-video"></i> Studio Reports</h4>
             <p>Assista aos vídeos dos ensaios e apresentações anteriores.</p>
@@ -580,16 +570,19 @@
       appId: "1:622030637005:web:5d2e5203a64f4cc35ba684"
     };
     
-    // Inicializar Firebase com tratamento de erro
+    // Inicializar Firebase com tratamento de erro melhorado
+    let db;
+    let firebaseInitialized = false;
+    
     try {
         firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        firebaseInitialized = true;
         console.log("Firebase inicializado com sucesso!");
     } catch (error) {
         console.error("Erro ao inicializar Firebase:", error);
-        alert("Erro de configuração do Firebase. Verifique o console para detalhes.");
+        firebaseInitialized = false;
     }
-    
-    const db = firebase.firestore();
     
     // Elementos da DOM
     const registerPage = document.getElementById('register-page');
@@ -602,19 +595,6 @@
     const statusSection = document.getElementById('status-section');
     const statusMessage = document.getElementById('status-message');
     
-    // Função para testar a conexão com o Firebase
-    async function testFirebaseConnection() {
-        try {
-            const testDocRef = db.collection('test').doc('connectionTest');
-            await testDocRef.set({ test: true, timestamp: new Date() });
-            console.log("Conexão com Firebase bem-sucedida!");
-            return true;
-        } catch (error) {
-            console.error("Falha na conexão com Firebase:", error);
-            return false;
-        }
-    }
-    
     // Mostrar mensagem
     function showMessage(text, type) {
       messageDiv.textContent = text;
@@ -626,7 +606,23 @@
       }, 5000);
     }
     
-    // Solicitar cadastro - Versão corrigida
+    // Função para verificar se o Firebase está funcionando (versão simplificada)
+    async function checkFirebaseStatus() {
+        if (!firebaseInitialized) {
+            return false;
+        }
+        
+        try {
+            // Teste simples de leitura ao invés de escrita
+            await db.collection('registrations').limit(1).get();
+            return true;
+        } catch (error) {
+            console.error("Erro ao verificar status do Firebase:", error);
+            return false;
+        }
+    }
+    
+    // Solicitar cadastro - Versão corrigida com melhor tratamento de erros
     registerBtn.addEventListener('click', async () => {
         const name = nameInput.value.trim();
         const email = emailInput.value.trim();
@@ -640,6 +636,11 @@
         
         if (password.length < 6) {
             showMessage('A senha deve ter pelo menos 6 caracteres.', 'error');
+            return;
+        }
+        
+        if (!firebaseInitialized) {
+            showMessage('Sistema temporariamente indisponível. Tente novamente em alguns minutos.', 'error');
             return;
         }
         
@@ -662,7 +663,7 @@
             await db.collection('registrations').doc(email).set({
                 name: name,
                 email: email,
-                passwordHash: btoa(password),
+                passwordHash: btoa(password), // Nota: Em produção, use hash mais seguro
                 instrument: instrument,
                 status: 'pending',
                 requestedAt: new Date(),
@@ -684,13 +685,15 @@
         } catch (error) {
             console.error('Erro detalhado:', error);
             
-            // Mensagens de erro mais específicas
+            // Mensagens de erro mais específicas e amigáveis
             if (error.code === 'permission-denied') {
-                showMessage('Erro de permissão. Verifique as regras do Firestore.', 'error');
+                showMessage('Acesso negado. Entre em contato com o administrador.', 'error');
             } else if (error.code === 'unavailable') {
-                showMessage('Erro de conexão. Verifique sua internet.', 'error');
+                showMessage('Serviço temporariamente indisponível. Tente novamente em alguns minutos.', 'error');
+            } else if (error.code === 'failed-precondition') {
+                showMessage('Configuração do sistema em andamento. Tente novamente em alguns minutos.', 'error');
             } else {
-                showMessage('Erro ao enviar solicitação: ' + error.message, 'error');
+                showMessage('Erro temporário. Tente novamente em alguns minutos.', 'error');
             }
         } finally {
             // Reabilitar botão
@@ -699,13 +702,18 @@
         }
     });
     
-    // Executar teste de conexão quando a página carregar
+    // Remover o teste de conexão automático que causava o erro inicial
+    // A verificação agora é feita apenas quando necessário
+    
+    // Verificar status quando a página carregar (sem mostrar erro)
     document.addEventListener('DOMContentLoaded', async () => {
-        const isConnected = await testFirebaseConnection();
-        if (!isConnected) {
-            showMessage('Erro de conexão com o servidor. Tente novamente mais tarde.', 'error');
+        const isWorking = await checkFirebaseStatus();
+        if (!isWorking) {
+            console.log('Firebase não está totalmente configurado ainda');
+            // Não mostrar erro para o usuário na inicialização
         }
     });
   </script>
 </body>
 </html>
+
