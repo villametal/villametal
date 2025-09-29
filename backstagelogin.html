@@ -316,6 +316,13 @@
       height: 45px;
       border-radius: 50%;
       border: 2px solid #dc2626;
+      background: linear-gradient(45deg, #dc2626, #f59e0b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
     }
     
     .portal-content {
@@ -561,7 +568,8 @@
       <div class="portal-header">
         <h2><i class="fas fa-door-open"></i> Backstage Villa Metal</h2>
         <div class="user-info">
-          <img id="user-avatar" class="user-avatar" src="" alt="Avatar">
+          <div id="user-avatar" class="user-avatar"></div>
+          <span id="user-display-name" style="color: #f1f5f9; font-weight: bold;"></span>
           <button id="logout-btn">Sair</button>
         </div>
       </div>
@@ -631,6 +639,7 @@
     
     // Elementos da DOM
     const registerPage = document.getElementById('register-page');
+    const portalPage = document.getElementById('portal-page');
     const nameInput = document.getElementById('name');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
@@ -639,6 +648,15 @@
     const messageDiv = document.getElementById('message');
     const statusSection = document.getElementById('status-section');
     const statusMessage = document.getElementById('status-message');
+    
+    // Elementos de login do usuário
+    const loginEmailInput = document.getElementById('login-email');
+    const loginPasswordInput = document.getElementById('login-password');
+    const loginBtn = document.getElementById('login-btn');
+    const userNameSpan = document.getElementById('user-name');
+    const userDisplayName = document.getElementById('user-display-name');
+    const userAvatar = document.getElementById('user-avatar');
+    const logoutBtn = document.getElementById('logout-btn');
     
     // Elementos da área administrativa
     const adminEmailInput = document.getElementById('admin-email');
@@ -649,8 +667,9 @@
     const approvedList = document.getElementById('approved-list');
     const adminLogoutBtn = document.getElementById('admin-logout');
     
-    // Estado da sessão administrativa
+    // Estado da sessão
     let isAdminLoggedIn = false;
+    let currentUser = null;
     
     // Função para criar hash simples (em produção, use uma biblioteca mais robusta)
     function simpleHash(str) {
@@ -712,6 +731,156 @@
             console.error("Erro ao inicializar administrador:", error);
         }
     }
+    
+    // ===== FUNCIONALIDADES DE LOGIN DO USUÁRIO =====
+    
+    // Login do usuário
+    loginBtn.addEventListener('click', async () => {
+        const email = loginEmailInput.value.trim();
+        const password = loginPasswordInput.value;
+        
+        if (!email || !password) {
+            showMessage('Por favor, preencha email e senha.', 'error');
+            return;
+        }
+        
+        if (!firebaseInitialized) {
+            showMessage('Sistema temporariamente indisponível.', 'error');
+            return;
+        }
+        
+        loginBtn.disabled = true;
+        loginBtn.textContent = 'Verificando...';
+        
+        try {
+            // Verificar se o usuário existe
+            const userDoc = await db.collection('registrations').doc(email).get();
+            
+            if (!userDoc.exists) {
+                showMessage('Email não encontrado. Verifique se você já se cadastrou.', 'error');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Acessar Backstage';
+                return;
+            }
+            
+            const userData = userDoc.data();
+            
+            // Verificar se o usuário está aprovado
+            if (userData.status !== 'approved') {
+                if (userData.status === 'pending') {
+                    showMessage('Sua solicitação ainda está pendente de aprovação.', 'pending');
+                } else if (userData.status === 'rejected') {
+                    showMessage('Sua solicitação foi rejeitada. Entre em contato com o administrador.', 'error');
+                } else {
+                    showMessage('Status de usuário inválido. Entre em contato com o administrador.', 'error');
+                }
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Acessar Backstage';
+                return;
+            }
+            
+            // Verificar senha
+            const passwordHash = btoa(password); // Mesmo método usado no cadastro
+            if (userData.passwordHash !== passwordHash) {
+                showMessage('Senha incorreta.', 'error');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Acessar Backstage';
+                return;
+            }
+            
+            // Login bem-sucedido
+            currentUser = userData;
+            showUserPortal(userData);
+            
+            // Salvar sessão no localStorage
+            localStorage.setItem('villaMetalLoggedUser', JSON.stringify({
+                email: userData.email,
+                name: userData.name,
+                instrument: userData.instrument,
+                loginTime: new Date().toISOString()
+            }));
+            
+            showMessage('Login realizado com sucesso!', 'success');
+            
+        } catch (error) {
+            console.error('Erro no login:', error);
+            showMessage('Erro ao fazer login. Tente novamente.', 'error');
+        } finally {
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Acessar Backstage';
+        }
+    });
+    
+    // Mostrar portal do usuário
+    function showUserPortal(userData) {
+        // Ocultar página de registro
+        registerPage.classList.add('hidden');
+        
+        // Mostrar página do portal
+        portalPage.classList.remove('hidden');
+        
+        // Configurar informações do usuário
+        userNameSpan.textContent = userData.name;
+        userDisplayName.textContent = userData.name;
+        
+        // Configurar avatar com inicial do nome
+        const initial = userData.name.charAt(0).toUpperCase();
+        userAvatar.textContent = initial;
+        
+        // Rolar para o topo
+        window.scrollTo(0, 0);
+    }
+    
+    // Logout do usuário
+    logoutBtn.addEventListener('click', () => {
+        // Limpar dados do usuário
+        currentUser = null;
+        
+        // Limpar localStorage
+        localStorage.removeItem('villaMetalLoggedUser');
+        
+        // Limpar campos de login
+        loginEmailInput.value = '';
+        loginPasswordInput.value = '';
+        
+        // Mostrar página de registro
+        registerPage.classList.remove('hidden');
+        
+        // Ocultar página do portal
+        portalPage.classList.add('hidden');
+        
+        showMessage('Logout realizado com sucesso!', 'success');
+        
+        // Rolar para o topo
+        window.scrollTo(0, 0);
+    });
+    
+    // Verificar sessão salva ao carregar a página
+    function checkSavedSession() {
+        const savedUser = localStorage.getItem('villaMetalLoggedUser');
+        if (savedUser) {
+            try {
+                const userData = JSON.parse(savedUser);
+                const loginTime = new Date(userData.loginTime);
+                const now = new Date();
+                const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
+                
+                // Manter sessão por 24 horas
+                if (hoursDiff < 24) {
+                    currentUser = userData;
+                    showUserPortal(userData);
+                } else {
+                    // Sessão expirada
+                    localStorage.removeItem('villaMetalLoggedUser');
+                }
+            } catch (error) {
+                console.error('Erro ao verificar sessão salva:', error);
+                localStorage.removeItem('villaMetalLoggedUser');
+            }
+        }
+    }
+    
+    // ===== FUNCIONALIDADES ADMINISTRATIVAS =====
     
     // Login administrativo
     adminLoginBtn.addEventListener('click', async () => {
@@ -939,6 +1108,8 @@
         });
     }
     
+    // ===== FUNCIONALIDADES DE CADASTRO =====
+    
     // Solicitar cadastro - Versão corrigida com melhor tratamento de erros
     registerBtn.addEventListener('click', async () => {
         const name = nameInput.value.trim();
@@ -1025,6 +1196,9 @@
         if (isWorking) {
             // Inicializar administrador padrão se necessário
             await initializeDefaultAdmin();
+            
+            // Verificar sessão salva
+            checkSavedSession();
         } else {
             console.log('Firebase não está totalmente configurado ainda');
         }
