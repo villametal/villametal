@@ -226,9 +226,14 @@
         </div>
     </footer>
 
+    <div id="photo-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden flex items-center justify-center z-[9999] p-4">
+        <div class="bg-gray-900 p-4 rounded-lg shadow-2xl max-w-lg w-full relative">
+            <button id="close-modal" class="absolute top-2 right-2 text-white hover:text-red-500 text-3xl font-bold leading-none opacity-75 hover:opacity-100 transition">&times;</button>
+            <img src="Publi Villa-Metal.png" alt="Foto Modal" class="w-full h-auto rounded-md">
+        </div>
+    </div>
+
     <script>
-        
-        // Efeito de scroll no header
         const header = document.getElementById('mainHeader');
         
         window.addEventListener('scroll', function() {
@@ -239,6 +244,34 @@
             }
         });
 
+        const modal = document.getElementById('photo-modal');
+        const closeModalButton = document.getElementById('close-modal');
+
+        function showModal() {
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function hideModal() {
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        if (closeModalButton) {
+            closeModalButton.addEventListener('click', hideModal);
+        }
+
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    hideModal();
+                }
+            });
+        }
+
+        setTimeout(showModal, 100);
     </script>
 </body>
 </html>
