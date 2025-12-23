@@ -338,8 +338,3 @@ document.addEventListener('DOMContentLoaded', () => {
   // Carregar dados iniciais mesmo antes de login
   loadDataFromFirestore();
 });
-
-function fecharModal(index) {
-    pausarVideo(index);
-    modals[index].style.display = "none";
-}
