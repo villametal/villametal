@@ -273,6 +273,11 @@
                 if (e.target === modal) {
                     hideModal();
                 }
+
+                function fecharModal(index) {
+    pausarVideo(index);
+    modals[index].style.display = "none";
+}
             });
         }
 
