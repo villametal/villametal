@@ -228,16 +228,6 @@
             </div>
         </div>
     </footer>
-
-    <div id="photo-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden flex items-center justify-center z-[9999] p-4">
-        <div class="bg-gray-900 p-4 rounded-lg shadow-2xl max-w-lg w-full relative">
-            <button id="close-modal" class="absolute top-2 right-2 text-white hover:text-red-500 text-3xl font-bold leading-none opacity-75 hover:opacity-100 transition">&times;</button>
-            <div id="youtube-container" class="mw-auto mh-auto">
-                <iframe src="https://www.youtube.com/embed/_AkFRM0N7Fk"></iframe>
-            </div>
-        </div>
-    </div>
-
     <script>
         const header = document.getElementById('mainHeader');
         
@@ -247,41 +237,7 @@
             } else {
                 header.classList.remove('header-scrolled');
             }
-        });
-
-        const modal = document.getElementById('photo-modal');
-        const closeModalButton = document.getElementById('close-modal');
-
-        function showModal() {
-            if (modal) {
-                modal.classList.remove('hidden');
-            }
-        }
-
-        function hideModal() {
-            if (modal) {
-                modal.classList.add('hidden');
-            }
-        }
-
-        if (closeModalButton) {
-            closeModalButton.addEventListener('click', hideModal);
-        }
-
-        if (modal) {
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    hideModal();
-                }
-
-                function closeModal(index) {
-    pauseVideo(index);
-    modal[index].style.display = "none";
-}
-            });
-        }
-
-        setTimeout(showModal, 100);
+        });        
     </script>
 </body>
 </html>
