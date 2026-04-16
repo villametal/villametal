@@ -1,348 +1,291 @@
-// Importações necessárias do Firebase modular
-import { auth, db } from "./firebase-config.js";
-import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-// Emails que são administradores autorizados
-const ADMIN_EMAILS = [
-  'villametal.emvl@gmail.com'
-];
-
-// Dados locais de frequência
+// Configuração de dados
 let frequencyData = {
-  participants: [],
-  dates: [],
-  attendance: {}
+    participants: ['João', 'Maria', 'Pedro'],
+    dates: ['2026-04-16', '2026-04-23', '2026-04-30'],
+    attendance: {
+        '2026-04-16': {
+            'João': 'present',
+            'Maria': 'absent',
+            'Pedro': 'not-marked',
+        },
+        '2026-04-23': {
+            'João': 'not-marked',
+            'Maria': 'present',
+            'Pedro': 'absent',
+        },
+        '2026-04-30': {
+            'João': 'not-marked',
+            'Maria': 'not-marked',
+            'Pedro': 'not-marked',
+        },
+    },
 };
 
 let isAdminLoggedIn = false;
-let currentUser = null;
+const ADMIN_EMAILS = ['villametal.emvl@gmail.com'];
+
+// Inicializar página
+document.addEventListener('DOMContentLoaded', () => {
+    loadData();
+    renderTable();
+    updateAuthUI();
+});
+
+// Carregar dados (do localStorage ou padrão)
+function loadData() {
+    const saved = localStorage.getItem('frequencyData2026');
+    if (saved) {
+        try {
+            frequencyData = JSON.parse(saved);
+        } catch (e) {
+            console.error('Erro ao carregar dados:', e);
+        }
+    }
+}
+
+// Salvar dados no localStorage
+function saveData() {
+    localStorage.setItem('frequencyData2026', JSON.stringify(frequencyData));
+}
+
+// Atualizar UI de autenticação
+function updateAuthUI() {
+    const loginForm = document.getElementById('loginForm');
+    const loggedInSection = document.getElementById('loggedInSection');
+    const adminControls = document.getElementById('adminControls');
+
+    if (isAdminLoggedIn) {
+        loginForm.classList.add('hidden');
+        loggedInSection.classList.remove('hidden');
+        adminControls.classList.add('show');
+    } else {
+        loginForm.classList.remove('hidden');
+        loggedInSection.classList.add('hidden');
+        adminControls.classList.remove('show');
+    }
+}
+
+// Fazer login
+function handleLogin(event) {
+    event.preventDefault();
+    clearMessages();
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    if (!email || !password) {
+        showError('Email e senha são obrigatórios');
+        return;
+    }
+
+    // Validação local (em produção, usar Firebase)
+    if (ADMIN_EMAILS.includes(email.toLowerCase()) && password.length >= 6) {
+        isAdminLoggedIn = true;
+        document.getElementById('currentUserEmail').textContent = email;
+        document.getElementById('email').value = '';
+        document.getElementById('password').value = '';
+        updateAuthUI();
+        showSuccess('Login realizado com sucesso!');
+    } else {
+        showError('Email ou senha incorretos');
+    }
+}
+
+// Fazer logout
+function handleLogout() {
+    isAdminLoggedIn = false;
+    updateAuthUI();
+    showSuccess('Logout realizado');
+}
+
+// Renderizar tabela de frequência
+function renderTable() {
+    const table = document.getElementById('frequencyTable');
+    const headerRow = document.getElementById('participantHeaders');
+
+    // Limpar conteúdo anterior
+    table.innerHTML = '';
+    headerRow.innerHTML = '';
+
+    // Adicionar headers dos participantes
+    frequencyData.participants.forEach(participant => {
+        const th = document.createElement('th');
+        th.textContent = participant;
+        th.style.textAlign = 'center';
+        headerRow.appendChild(th);
+    });
+
+    // Adicionar linhas de datas
+    frequencyData.dates.forEach(date => {
+        const row = document.createElement('tr');
+
+        // Coluna de data
+        const dateCell = document.createElement('td');
+        dateCell.textContent = formatDate(date);
+        dateCell.style.fontWeight = '500';
+        row.appendChild(dateCell);
+
+        // Colunas de presença
+        frequencyData.participants.forEach(participant => {
+            const cell = document.createElement('td');
+            cell.style.textAlign = 'center';
+
+            const status = frequencyData.attendance[date]?.[participant] || 'not-marked';
+            const button = document.createElement('button');
+            button.className = `attendance-btn ${status}`;
+            button.textContent = getStatusSymbol(status);
+            button.onclick = () => toggleAttendance(date, participant);
+
+            cell.appendChild(button);
+            row.appendChild(cell);
+        });
+
+        table.appendChild(row);
+    });
+}
+
+// Alternar status de presença (PÚBLICO - sem login necessário)
+function toggleAttendance(date, participant) {
+    const current = frequencyData.attendance[date]?.[participant] || 'not-marked';
+    let next;
+
+    switch (current) {
+        case 'not-marked':
+            next = 'present';
+            break;
+        case 'present':
+            next = 'absent';
+            break;
+        case 'absent':
+            next = 'not-marked';
+            break;
+        default:
+            next = 'not-marked';
+    }
+
+    // Atualizar dados
+    if (!frequencyData.attendance[date]) {
+        frequencyData.attendance[date] = {};
+    }
+    frequencyData.attendance[date][participant] = next;
+
+    // Salvar no localStorage
+    saveData();
+
+    // Atualizar UI
+    renderTable();
+    showSuccess('Presença marcada com sucesso!');
+}
+
+// Adicionar nova data (APENAS ADMIN)
+function addNewDate() {
+    if (!isAdminLoggedIn) {
+        showError('Você precisa estar logado como administrador');
+        return;
+    }
+
+    const newDate = document.getElementById('newDate').value;
+    clearMessages();
+
+    if (!newDate) {
+        showError('Por favor, selecione uma data');
+        return;
+    }
+
+    if (frequencyData.dates.includes(newDate)) {
+        showError('Esta data já existe');
+        return;
+    }
+
+    // Adicionar data
+    frequencyData.dates.push(newDate);
+    frequencyData.dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+
+    // Inicializar attendance para todos os participantes
+    frequencyData.participants.forEach(participant => {
+        if (!frequencyData.attendance[newDate]) {
+            frequencyData.attendance[newDate] = {};
+        }
+        frequencyData.attendance[newDate][participant] = 'not-marked';
+    });
+
+    // Salvar e atualizar
+    saveData();
+    renderTable();
+    document.getElementById('newDate').value = '';
+    showSuccess('Data adicionada com sucesso!');
+}
+
+// Adicionar novo participante (APENAS ADMIN)
+function addNewParticipant() {
+    if (!isAdminLoggedIn) {
+        showError('Você precisa estar logado como administrador');
+        return;
+    }
+
+    const newParticipant = document.getElementById('newParticipant').value.trim();
+    clearMessages();
+
+    if (!newParticipant) {
+        showError('Por favor, digite o nome do participante');
+        return;
+    }
+
+    if (frequencyData.participants.includes(newParticipant)) {
+        showError('Este participante já existe');
+        return;
+    }
+
+    // Adicionar participante
+    frequencyData.participants.push(newParticipant);
+
+    // Inicializar attendance para todas as datas
+    frequencyData.dates.forEach(date => {
+        if (!frequencyData.attendance[date]) {
+            frequencyData.attendance[date] = {};
+        }
+        frequencyData.attendance[date][newParticipant] = 'not-marked';
+    });
+
+    // Salvar e atualizar
+    saveData();
+    renderTable();
+    document.getElementById('newParticipant').value = '';
+    showSuccess('Participante adicionado com sucesso!');
+}
 
 // Funções auxiliares
-
 function formatDate(dateString) {
-  const d = new Date(dateString + 'T00:00:00');
-  return d.toLocaleDateString('pt-BR');
+    const d = new Date(dateString + 'T00:00:00');
+    return d.toLocaleDateString('pt-BR');
 }
 
-// Verifica se o email é de admin
-function isAdminEmail(email) {
-  if (!email) return false;
-  return ADMIN_EMAILS.includes(email.toLowerCase());
-}
-
-// Renderiza tabela - SEMPRE EDITÁVEL PARA PRESENÇA PÚBLICA
-function renderTable() {
-  const header = document.getElementById('table-header');
-  const body = document.getElementById('table-body');
-
-  // Limpar o cabeçalho e corpo
-  header.innerHTML = '<th>Data</th>';
-  body.innerHTML = '';
-
-  // Cabeçalhos dos participantes
-  frequencyData.participants.forEach(participant => {
-    const th = document.createElement('th');
-    th.textContent = participant;
-    header.appendChild(th);
-  });
-
-  // Linhas para cada data
-  frequencyData.dates.forEach(date => {
-    const tr = document.createElement('tr');
-    const tdDate = document.createElement('td');
-    tdDate.textContent = formatDate(date);
-    tdDate.classList.add('date-cell');
-    tr.appendChild(tdDate);
-
-    frequencyData.participants.forEach(participant => {
-      const td = document.createElement('td');
-      const status = frequencyData.attendance[date]?.[participant] || 'not-marked';
-      td.className = `presence-cell ${status}`;
-      td.dataset.date = date;
-      td.dataset.participant = participant;
-
-      // SEMPRE permitir edição de presença (público)
-      td.addEventListener('click', () => {
-        const newStatus = toggleAttendance(date, participant);
-        td.className = `presence-cell ${newStatus}`;
-      });
-
-      tr.appendChild(td);
-    });
-
-    body.appendChild(tr);
-  });
-}
-
-// Alternar presença e salvar IMEDIATAMENTE no Firebase
-async function toggleAttendance(date, participant) {
-  const current = frequencyData.attendance[date]?.[participant] || 'not-marked';
-  let next;
-  switch (current) {
-    case 'not-marked':
-      next = 'present';
-      break;
-    case 'present':
-      next = 'absent';
-      break;
-    case 'absent':
-      next = 'not-marked';
-      break;
-    default:
-      next = 'not-marked';
-  }
-  
-  // Se não existe o objeto attendance para a data, inicializa
-  if (!frequencyData.attendance[date]) {
-    frequencyData.attendance[date] = {};
-  }
-  frequencyData.attendance[date][participant] = next;
-  
-  // Salvar IMEDIATAMENTE no Firebase
-  try {
-    const docRef = doc(db, 'frequency2026', 'data');
-    const path = `attendance.${date}.${participant}`;
-    await updateDoc(docRef, {
-      [path]: next,
-    });
-    showMessage('Presença marcada com sucesso!', 'success');
-  } catch (error) {
-    console.error('Erro ao salvar presença:', error);
-    showMessage('Erro ao salvar presença: ' + error.message, 'error');
-  }
-  
-  return next;
-}
-
-// Adicionar nova data
-async function addNewDate() {
-  const inputDate = document.getElementById('new-date').value;
-  if (!inputDate) {
-    showMessage('Por favor, selecione uma data.', 'error');
-    return;
-  }
-
-  const date = inputDate.trim();
-  if (frequencyData.dates.includes(date)) {
-    showMessage('Esta data já existe na tabela.', 'error');
-    return;
-  }
-
-  try {
-    frequencyData.dates.push(date);
-    frequencyData.dates.sort((a, b) => new Date(a) - new Date(b));
-
-    // inicializar para todos participantes
-    frequencyData.participants.forEach(p => {
-      if (!frequencyData.attendance[date]) {
-        frequencyData.attendance[date] = {};
-      }
-      frequencyData.attendance[date][p] = 'not-marked';
-    });
-
-    // Salvar IMEDIATAMENTE no Firebase
-    const docRef = doc(db, 'frequency2026', 'data');
-    await setDoc(docRef, frequencyData);
-
-    document.getElementById('new-date').value = '';
-    renderTable();
-    showMessage('Data adicionada com sucesso!', 'success');
-  } catch (error) {
-    console.error('Erro ao adicionar data:', error);
-    showMessage('Erro ao adicionar data: ' + error.message, 'error');
-  }
-}
-
-// Adicionar novo participante
-async function addNewParticipant() {
-  const inputName = document.getElementById('new-participant').value;
-  const name = inputName.trim();
-  if (!name) {
-    showMessage('Por favor, digite o nome do participante.', 'error');
-    return;
-  }
-  if (frequencyData.participants.includes(name)) {
-    showMessage('Este participante já existe na tabela.', 'error');
-    return;
-  }
-
-  try {
-    frequencyData.participants.push(name);
-
-    // inicializar para todas as datas
-    frequencyData.dates.forEach(date => {
-      if (!frequencyData.attendance[date]) {
-        frequencyData.attendance[date] = {};
-      }
-      frequencyData.attendance[date][name] = 'not-marked';
-    });
-
-    // Salvar IMEDIATAMENTE no Firebase
-    const docRef = doc(db, 'frequency2026', 'data');
-    await setDoc(docRef, frequencyData);
-
-    document.getElementById('new-participant').value = '';
-    renderTable();
-    showMessage('Participante adicionado com sucesso!', 'success');
-  } catch (error) {
-    console.error('Erro ao adicionar participante:', error);
-    showMessage('Erro ao adicionar participante: ' + error.message, 'error');
-  }
-}
-
-// Carregar dados do Firestore
-async function loadDataFromFirestore() {
-  try {
-    showLoading(true);
-
-    const docRef = doc(db, 'frequency2026', 'data');
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      // verificar estrutura
-      if ('participants' in data && 'dates' in data && 'attendance' in data) {
-        frequencyData = data;
-      }
+function getStatusSymbol(status) {
+    switch (status) {
+        case 'present':
+            return '✓';
+        case 'absent':
+            return '✗';
+        default:
+            return '-';
     }
-  } catch (error) {
-    console.error('Erro ao carregar dados:', error);
-    showMessage('Erro ao carregar dados: ' + error.message, 'error');
-  } finally {
-    showLoading(false);
-    renderTable();
-  }
 }
 
-// Mostrar interface de administrador
-function showAdminInterface(user) {
-  document.getElementById('login-form').classList.add('hidden');
-  document.getElementById('admin-panel').classList.remove('hidden');
-  document.getElementById('admin-controls').classList.remove('hidden');
-  document.getElementById('admin-email').textContent = user.email;
-  renderTable();
+function showError(message) {
+    const errorDiv = document.getElementById('errorMessage');
+    errorDiv.textContent = message;
+    errorDiv.classList.add('show');
+    setTimeout(() => errorDiv.classList.remove('show'), 3000);
 }
 
-// Mostrar interface pública
-function showPublicInterface() {
-  document.getElementById('login-form').classList.remove('hidden');
-  document.getElementById('admin-panel').classList.add('hidden');
-  document.getElementById('admin-controls').classList.add('hidden');
-  document.getElementById('email').value = '';
-  document.getElementById('password').value = '';
-  renderTable();
+function showSuccess(message) {
+    const successDiv = document.getElementById('successMessage');
+    successDiv.textContent = message;
+    successDiv.classList.add('show');
+    setTimeout(() => successDiv.classList.remove('show'), 3000);
 }
 
-// Mostrar mensagem de sucesso / erro
-function showMessage(msg, type) {
-  // remover mensagens existentes
-  const old = document.querySelectorAll('.error-message, .success-message');
-  old.forEach(e => e.remove());
-
-  const div = document.createElement('div');
-  div.className = (type === 'error') ? 'error-message' : 'success-message';
-  div.textContent = msg;
-
-  const authSection = document.getElementById('auth-section');
-  authSection.appendChild(div);
-
-  setTimeout(() => {
-    div.remove();
-  }, 5000);
+function clearMessages() {
+    document.getElementById('errorMessage').classList.remove('show');
+    document.getElementById('successMessage').classList.remove('show');
 }
-
-// Mostrar loading
-function showLoading(isLoading) {
-  const container = document.getElementById('frequency-table-container');
-  if (isLoading) {
-    container.innerHTML = '<p class="text-center text-gray-600">Carregando dados...</p>';
-  } else {
-    // limpa para renderização normal
-    container.innerHTML = `<table id="frequency-table">
-        <thead>
-          <tr id="table-header"><th>Data</th></tr>
-        </thead>
-        <tbody id="table-body"></tbody>
-      </table>`;
-  }
-}
-
-// Autenticação: login, logout e listener
-
-async function login() {
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-
-  if (!email || !password) {
-    showMessage('Email e senha são obrigatórios', 'error');
-    return;
-  }
-
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-
-    // Verificar se é admin
-    if (isAdminEmail(user.email)) {
-      isAdminLoggedIn = true;
-      currentUser = user;
-      showAdminInterface(user);
-      showMessage('Login realizado com sucesso!', 'success');
-    } else {
-      await signOut(auth);
-      showMessage('Email não autorizado como administrador', 'error');
-    }
-  } catch (error) {
-    console.error('Erro ao fazer login:', error);
-    showMessage('Erro ao fazer login: ' + error.message, 'error');
-  }
-}
-
-async function logout() {
-  try {
-    await signOut(auth);
-    isAdminLoggedIn = false;
-    currentUser = null;
-    showPublicInterface();
-    showMessage('Logout realizado', 'success');
-  } catch (error) {
-    console.error('Erro ao fazer logout:', error);
-    showMessage('Erro ao fazer logout: ' + error.message, 'error');
-  }
-}
-
-// Monitorar estado de autenticação
-onAuthStateChanged(auth, (user) => {
-  if (user && isAdminEmail(user.email)) {
-    isAdminLoggedIn = true;
-    currentUser = user;
-    showAdminInterface(user);
-  } else {
-    isAdminLoggedIn = false;
-    currentUser = null;
-    showPublicInterface();
-  }
-});
-
-// Event listeners
-document.getElementById('btn-login').addEventListener('click', login);
-document.getElementById('btn-logout').addEventListener('click', logout);
-document.getElementById('btn-add-date').addEventListener('click', addNewDate);
-document.getElementById('btn-add-participant').addEventListener('click', addNewParticipant);
-
-// Permitir Enter em inputs
-document.getElementById('email').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') login();
-});
-document.getElementById('password').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') login();
-});
-document.getElementById('new-date').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') addNewDate();
-});
-document.getElementById('new-participant').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') addNewParticipant();
-});
-
-// Carregar dados ao iniciar
-loadDataFromFirestore();
