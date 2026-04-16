@@ -1,7 +1,7 @@
 // Importações necessárias do Firebase modular
 import { auth, db } from "./firebase-config.js";
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Emails que são administradores autorizados
 const ADMIN_EMAILS = [
@@ -31,7 +31,7 @@ function isAdminEmail(email) {
   return ADMIN_EMAILS.includes(email.toLowerCase());
 }
 
-// Renderiza tabela - SEMPRE EDITÁVEL PARA PRESENÇA PÚBLICA
+// Renderiza tabela - SEMPRE COM PRESENÇA CLICÁVEL (pública)
 function renderTable() {
   const header = document.getElementById('table-header');
   const body = document.getElementById('table-body');
@@ -62,10 +62,12 @@ function renderTable() {
       td.dataset.date = date;
       td.dataset.participant = participant;
 
-      // SEMPRE permitir edição de presença (público)
+      // PRESENÇA SEMPRE CLICÁVEL (pública, sem login necessário)
       td.addEventListener('click', () => {
         const newStatus = toggleAttendance(date, participant);
         td.className = `presence-cell ${newStatus}`;
+        // Salvar automaticamente no Firebase
+        saveDataToFirestore();
       });
 
       tr.appendChild(td);
@@ -75,8 +77,8 @@ function renderTable() {
   });
 }
 
-// Alternar presença e salvar IMEDIATAMENTE no Firebase
-async function toggleAttendance(date, participant) {
+// Alternar presença
+function toggleAttendance(date, participant) {
   const current = frequencyData.attendance[date]?.[participant] || 'not-marked';
   let next;
   switch (current) {
@@ -92,31 +94,21 @@ async function toggleAttendance(date, participant) {
     default:
       next = 'not-marked';
   }
-  
   // Se não existe o objeto attendance para a data, inicializa
   if (!frequencyData.attendance[date]) {
     frequencyData.attendance[date] = {};
   }
   frequencyData.attendance[date][participant] = next;
-  
-  // Salvar IMEDIATAMENTE no Firebase
-  try {
-    const docRef = doc(db, 'frequency2026', 'data');
-    const path = `attendance.${date}.${participant}`;
-    await updateDoc(docRef, {
-      [path]: next,
-    });
-    showMessage('Presença marcada com sucesso!', 'success');
-  } catch (error) {
-    console.error('Erro ao salvar presença:', error);
-    showMessage('Erro ao salvar presença: ' + error.message, 'error');
-  }
-  
   return next;
 }
 
-// Adicionar nova data
-async function addNewDate() {
+// Adicionar nova data (APENAS ADMIN)
+function addNewDate() {
+  if (!isAdminLoggedIn) {
+    showMessage('Você precisa estar logado como administrador.', 'error');
+    return;
+  }
+
   const inputDate = document.getElementById('new-date').value;
   if (!inputDate) {
     showMessage('Por favor, selecione uma data.', 'error');
@@ -129,33 +121,31 @@ async function addNewDate() {
     return;
   }
 
-  try {
-    frequencyData.dates.push(date);
-    frequencyData.dates.sort((a, b) => new Date(a) - new Date(b));
+  frequencyData.dates.push(date);
+  // ordenar corretamente
+  frequencyData.dates.sort((a, b) => new Date(a) - new Date(b));
 
-    // inicializar para todos participantes
-    frequencyData.participants.forEach(p => {
-      if (!frequencyData.attendance[date]) {
-        frequencyData.attendance[date] = {};
-      }
-      frequencyData.attendance[date][p] = 'not-marked';
-    });
+  // inicializar para todos participantes
+  frequencyData.participants.forEach(p => {
+    if (!frequencyData.attendance[date]) {
+      frequencyData.attendance[date] = {};
+    }
+    frequencyData.attendance[date][p] = 'not-marked';
+  });
 
-    // Salvar IMEDIATAMENTE no Firebase
-    const docRef = doc(db, 'frequency2026', 'data');
-    await setDoc(docRef, frequencyData);
-
-    document.getElementById('new-date').value = '';
-    renderTable();
-    showMessage('Data adicionada com sucesso!', 'success');
-  } catch (error) {
-    console.error('Erro ao adicionar data:', error);
-    showMessage('Erro ao adicionar data: ' + error.message, 'error');
-  }
+  document.getElementById('new-date').value = '';
+  renderTable();
+  saveDataToFirestore();
+  showMessage('Data adicionada com sucesso!', 'success');
 }
 
-// Adicionar novo participante
-async function addNewParticipant() {
+// Adicionar novo participante (APENAS ADMIN)
+function addNewParticipant() {
+  if (!isAdminLoggedIn) {
+    showMessage('Você precisa estar logado como administrador.', 'error');
+    return;
+  }
+
   const inputName = document.getElementById('new-participant').value;
   const name = inputName.trim();
   if (!name) {
@@ -167,28 +157,20 @@ async function addNewParticipant() {
     return;
   }
 
-  try {
-    frequencyData.participants.push(name);
+  frequencyData.participants.push(name);
 
-    // inicializar para todas as datas
-    frequencyData.dates.forEach(date => {
-      if (!frequencyData.attendance[date]) {
-        frequencyData.attendance[date] = {};
-      }
-      frequencyData.attendance[date][name] = 'not-marked';
-    });
+  // inicializar para todas as datas
+  frequencyData.dates.forEach(date => {
+    if (!frequencyData.attendance[date]) {
+      frequencyData.attendance[date] = {};
+    }
+    frequencyData.attendance[date][name] = 'not-marked';
+  });
 
-    // Salvar IMEDIATAMENTE no Firebase
-    const docRef = doc(db, 'frequency2026', 'data');
-    await setDoc(docRef, frequencyData);
-
-    document.getElementById('new-participant').value = '';
-    renderTable();
-    showMessage('Participante adicionado com sucesso!', 'success');
-  } catch (error) {
-    console.error('Erro ao adicionar participante:', error);
-    showMessage('Erro ao adicionar participante: ' + error.message, 'error');
-  }
+  document.getElementById('new-participant').value = '';
+  renderTable();
+  saveDataToFirestore();
+  showMessage('Participante adicionado com sucesso!', 'success');
 }
 
 // Carregar dados do Firestore
@@ -211,6 +193,18 @@ async function loadDataFromFirestore() {
   } finally {
     showLoading(false);
     renderTable();
+  }
+}
+
+// Salvar dados no Firestore (AUTOMÁTICO - sem confirmação)
+async function saveDataToFirestore() {
+  try {
+    const docRef = doc(db, 'frequency2026', 'data');
+    await setDoc(docRef, frequencyData);
+    console.log('Dados salvos automaticamente no Firebase');
+  } catch (error) {
+    console.error('Erro ao salvar dados:', error);
+    showMessage('Erro ao salvar dados: ' + error.message, 'error');
   }
 }
 
@@ -272,77 +266,74 @@ function showLoading(isLoading) {
 async function login() {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
-
   if (!email || !password) {
-    showMessage('Email e senha são obrigatórios', 'error');
+    showMessage('Preencha todos os campos.', 'error');
     return;
   }
-
+  if (!isAdminEmail(email)) {
+    showMessage('Email não autorizado para administração.', 'error');
+    return;
+  }
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-
-    // Verificar se é admin
-    if (isAdminEmail(user.email)) {
-      isAdminLoggedIn = true;
-      currentUser = user;
-      showAdminInterface(user);
-      showMessage('Login realizado com sucesso!', 'success');
-    } else {
-      await signOut(auth);
-      showMessage('Email não autorizado como administrador', 'error');
-    }
+    await signInWithEmailAndPassword(auth, email, password);
+    showMessage('Login realizado com sucesso!', 'success');
   } catch (error) {
-    console.error('Erro ao fazer login:', error);
-    showMessage('Erro ao fazer login: ' + error.message, 'error');
+    console.error('Erro no login:', error);
+    showMessage('Erro no login: ' + error.message, 'error');
   }
 }
 
 async function logout() {
+  if (!confirm('Deseja realmente sair?')) return;
   try {
     await signOut(auth);
-    isAdminLoggedIn = false;
-    currentUser = null;
-    showPublicInterface();
-    showMessage('Logout realizado', 'success');
+    showMessage('Logout realizado com sucesso!', 'success');
   } catch (error) {
-    console.error('Erro ao fazer logout:', error);
-    showMessage('Erro ao fazer logout: ' + error.message, 'error');
+    console.error('Erro no logout:', error);
+    showMessage('Erro no logout: ' + error.message, 'error');
   }
 }
 
-// Monitorar estado de autenticação
+// Ouvir o estado de autenticação
 onAuthStateChanged(auth, (user) => {
   if (user && isAdminEmail(user.email)) {
-    isAdminLoggedIn = true;
     currentUser = user;
+    isAdminLoggedIn = true;
     showAdminInterface(user);
+    loadDataFromFirestore();
   } else {
-    isAdminLoggedIn = false;
     currentUser = null;
+    isAdminLoggedIn = false;
     showPublicInterface();
+    loadDataFromFirestore();
   }
 });
 
-// Event listeners
-document.getElementById('btn-login').addEventListener('click', login);
-document.getElementById('btn-logout').addEventListener('click', logout);
-document.getElementById('btn-add-date').addEventListener('click', addNewDate);
-document.getElementById('btn-add-participant').addEventListener('click', addNewParticipant);
+// Pegando os botões do DOM e associando eventos
 
-// Permitir Enter em inputs
-document.getElementById('email').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') login();
-});
-document.getElementById('password').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') login();
-});
-document.getElementById('new-date').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') addNewDate();
-});
-document.getElementById('new-participant').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') addNewParticipant();
-});
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('btn-login').addEventListener('click', login);
+  document.getElementById('btn-logout').addEventListener('click', logout);
+  document.getElementById('btn-add-date').addEventListener('click', addNewDate);
+  document.getElementById('btn-add-participant').addEventListener('click', addNewParticipant);
 
-// Carregar dados ao iniciar
-loadDataFromFirestore();
+  // REMOVER botão "Salvar Alterações" - não é mais necessário
+  const btnSave = document.getElementById('btn-save');
+  if (btnSave) {
+    btnSave.remove();
+  }
+
+  // Permitir login com tecla Enter
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  [emailInput, passwordInput].forEach(input => {
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        login();
+      }
+    });
+  });
+
+  // Carregar dados iniciais mesmo antes de login
+  loadDataFromFirestore();
+});
