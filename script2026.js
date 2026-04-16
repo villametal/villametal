@@ -1,7 +1,7 @@
 // Importações necessárias do Firebase modular
 import { auth, db } from "./firebase-config.js";
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Emails que são administradores autorizados
 const ADMIN_EMAILS = [
@@ -18,6 +18,7 @@ let frequencyData = {
 let isAdminLoggedIn = false;
 let currentUser = null;
 let unsavedChanges = false;
+let unsubscribeSnapshot = null;
 
 // Funções auxiliares
 
@@ -65,8 +66,7 @@ function renderTable() {
 
       // SEMPRE permitir edição de presença (público)
       td.addEventListener('click', () => {
-        const newStatus = toggleAttendance(date, participant);
-        td.className = `presence-cell ${newStatus}`;
+        toggleAttendance(date, participant);
       });
 
       tr.appendChild(td);
@@ -112,8 +112,6 @@ async function toggleAttendance(date, participant) {
     console.error('Erro ao salvar presença:', error);
     showMessage('Erro ao salvar presença: ' + error.message, 'error');
   }
-  
-  return next;
 }
 
 // Adicionar nova data
@@ -192,26 +190,34 @@ async function addNewParticipant() {
   }
 }
 
-// Carregar dados do Firestore
+// Carregar dados do Firestore e configurar listener em tempo real
 async function loadDataFromFirestore() {
   try {
     showLoading(true);
 
     const docRef = doc(db, 'frequency2026', 'data');
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      // verificar estrutura
-      if ('participants' in data && 'dates' in data && 'attendance' in data) {
-        frequencyData = data;
+    
+    // Configurar listener em tempo real (onSnapshot)
+    // Este listener será chamado sempre que o documento mudar
+    unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        // verificar estrutura
+        if ('participants' in data && 'dates' in data && 'attendance' in data) {
+          frequencyData = data;
+          renderTable();
+        }
       }
-    }
+      showLoading(false);
+    }, (error) => {
+      console.error('Erro ao ouvir mudanças no Firestore:', error);
+      showMessage('Erro ao carregar dados: ' + error.message, 'error');
+      showLoading(false);
+    });
   } catch (error) {
-    console.error('Erro ao carregar dados:', error);
+    console.error('Erro ao configurar listener:', error);
     showMessage('Erro ao carregar dados: ' + error.message, 'error');
-  } finally {
     showLoading(false);
-    renderTable();
   }
 }
 
