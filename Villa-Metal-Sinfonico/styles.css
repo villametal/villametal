@@ -13,7 +13,7 @@
 .bio-links a:hover{background:var(--petrol);border-color:var(--petrol);color:var(--white);transform:translateY(-2px)}
 @media(max-width:640px){
   .mobile-menu{display:none;background:none;border:0;color:var(--white);font:11px 'IBM Plex Mono',monospace;text-transform:uppercase}
-  .hero{background:linear-gradient(90deg,#121416f5 0%,#121416c7 44%,#1214164d 100%),url('assets/header-palco-ccjf - Copia.png') center/cover; background-size:auto,100% auto;background-position:center,center top;background-repeat:no-repeat;background-color:#121416}
+  .hero{background:linear-gradient(90deg,#121416f5 0%,#121416c7 44%,#1214164d 100%),url('assets/header-palco-ccjf-Copia.png') center/cover; background-size:auto,100% auto;background-position:center,center top;background-repeat:no-repeat;background-color:#121416}
   .hero-copy{padding:30px 22px 24px}
   .hero h1{font-size:clamp(48px,12vw,82px);line-height:.9;letter-spacing:.5px;margin:20px 0 18px}
   .hero h1 em{font-size:.62em;letter-spacing:-1.5px}
