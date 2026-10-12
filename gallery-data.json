@@ -111,7 +111,7 @@
     "id": "temporada-2026-bio-semana-do-rock-2026",
     "season": "Temporada 2026",
     "title": "Bio Semana do Rock 2026",
-    "date": "Temporada 2026 — 09/10/2026",
+    "date": "09/10/2026",
     "location": "Escola de Música Villa-Lobos",
     "description": "Registro fotográfico da Temporada 2026.",
     "image": "gallery/assets/temporada-2026-bio-semana-do-rock-2026.webp",
@@ -123,7 +123,7 @@
     "id": "temporada-2026-capa-aula-inaugural",
     "season": "Temporada 2026",
     "title": "Capa Aula Inaugural",
-    "date": "Temporada 2026 — 10/03/2026",
+    "date": "10/03/2026",
     "location": "Teatro João Caetano",
     "description": "Registro fotográfico da Temporada 2026.",
     "image": "gallery/assets/temporada-2026-capa-aula-inaugural.webp",
@@ -135,7 +135,7 @@
     "id": "temporada-2026-flyer-semana-do-rock-2026",
     "season": "Temporada 2026",
     "title": "Flyer Semana do Rock 2026",
-    "date": "Temporada 2026 — 09/10/2026",
+    "date": "09/10/2026",
     "location": "Escola de Música Villa-Lobos",
     "description": "Registro fotográfico da Temporada 2026.",
     "image": "gallery/assets/temporada-2026-flyer-semana-do-rock-2026.webp",
@@ -159,12 +159,25 @@
     "id": "temporada-2026-wendell-narciso-feio",
     "season": "Temporada 2026",
     "title": "Wendell Narciso Feio",
-    "date": "Temporada 2026 — data a confirmar",
-    "location": "Local a confirmar",
+    "date": "Temporada 2026",
+    "location": "Escola de Música Villa-Lobos",
     "description": "Registro fotográfico da Temporada 2026.",
     "image": "gallery/assets/temporada-2026-wendell-narciso-feio.webp",
     "share_image": "gallery/assets/temporada-2026-wendell-narciso-feio.jpg",
     "width": 1080,
     "height": 1920
+  }
+
+  {
+    "id": "temporada-2026-feijão-carioca",
+    "season": "Temporada 2026",
+    "title": "Feijão Carioca",
+    "date": "25/09/2026",
+    "location": "Escola de Música Villa-Lobos",
+    "description": "Registro fotográfico da Temporada 2026.",
+    "image": "gallery/assets/temporada-2026-feijão-carioca.webp",
+    "share_image": "gallery/assets/temporada-2026-feijão-carioca.jpg",
+    "width": 1536,
+    "height": 2048
   }
 ]
