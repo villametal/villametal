@@ -1,9 +1,3 @@
-/*
- * Salvar como: gallery/photos/gallery.css
- * Os HTMLs dentro de gallery/photos/ já apontam para "gallery.css".
- * Este arquivo importa o estilo geral e acrescenta o layout da foto individual.
- */
-
 @import url("../gallery.css");
 
 /* Área principal da página individual */
