@@ -18,6 +18,72 @@
     <meta name="twitter:description" content="Registro fotográfico da Temporada 2026.">
     <meta name="twitter:image" content="https://villametal.github.io/villametal/gallery/assets/temporada-2026-feijao-carioca.jpg">
     <link rel="stylesheet" href="gallery.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
+
+        .backstage-button {
+            background: linear-gradient(45deg, #dc2626, #f59e0b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: absolute;
+            right: 15px; top: 15px;
+            font-size: 12px;
+            background-color: linear-gradient(90deg, #0f0c29, #302b63, #24243e);
+            padding: 1px 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px #dc2626;
+        }
+
+        .backstage-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 30px rgba(220, 38, 38);
+        }
+        .header-scrolled .backstage-button {
+            font-size: 12px;
+            right: 15px; top: 15px;
+        }
+
+        header {
+                transition: all 0.3s ease;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+        
+        .header-scrolled {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        
+        .header-scrolled .logo-container img {
+            width: 120px !important;
+        }
+        
+        .header-scrolled .logo-container p {
+            display: none !important;
+        }
+        
+        @media (max-width: 768px) {
+            .header-scrolled nav li span {
+                display: none !important;
+            }
+            .backstage-button {
+            position: static;
+            font-size: 12px;
+            background-color: linear-gradient(90deg, #0f0c29, #302b63, #24243e);
+            }
+            .header-scrolled .backstage-button {
+            font-size: 12px;
+            box-shadow: 0 1px 10px #dc2626;       
+        }       
+        }
+    </style>
   </head>
   <body>
     <div>
