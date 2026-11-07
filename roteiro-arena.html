@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="VILLA-METAL ARENA | Roteiro Arena">
+  <meta property="og:description" content="VILLA-METAL ARENA — Escola de Música Villa-Lobos, Auditório Guerra-Peixe. Entrada gratuita.">
+  <meta property="og:url" content="https://villametal.github.io/villametal/roteiro-arena">
+  <meta property="og:image" content="https://villametal.github.io/villametal/villa-metal-arena-open-graph.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1152">
+  <meta property="og:image:height" content="2048">
+  <meta property="og:image:alt" content="Flyer do show VILLA-METAL ARENA com palco, músicos e informações do evento.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="VILLA-METAL ARENA | Roteiro Arena">
+  <meta name="twitter:description" content="VILLA-METAL ARENA — Escola de Música Villa-Lobos, Auditório Guerra-Peixe. Entrada gratuita.">
+  <meta name="twitter:image" content="https://villametal.github.io/villametal/villa-metal-arena-open-graph.jpg">
+  <title>VILLA-METAL ARENA | Roteiro Arena</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root { color-scheme: dark; }
+    body { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
+    header { position: sticky; top: 0; z-index: 1000; }
+    .backstage-button { background: linear-gradient(45deg,#dc2626,#f59e0b); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .show-logo { display:flex; flex-direction:column; align-items:flex-start; color:#f8fafc; font-family:Impact,Haettenschweiler,'Arial Narrow Bold',sans-serif; font-size:clamp(1.8rem,3vw,2.7rem); font-weight:900; line-height:.82; letter-spacing:.02em; text-shadow:0 2px 10px rgba(0,0,0,.75); white-space:nowrap; }
+    .show-logo .arena-word { margin-top:.18em; padding-left:.15em; color:#dc2626; font-size:.82em; letter-spacing:.42em; }
+    .arena-table { border:1px solid #374151; border-radius:12px; overflow:hidden; background:rgba(31,41,55,.5); }
+    .arena-head, .arena-row { display:grid; grid-template-columns:minmax(150px, 1fr) minmax(0, 3fr) minmax(130px, .8fr); }
+    .arena-head { background:rgba(17,24,39,.92); color:#f87171; font-weight:700; }
+    .arena-head > div, .arena-row > div { padding:12px 16px; min-width:0; }
+    .arena-head > div + div, .arena-row > div + div { border-left:1px solid #4b5563; }
+    .arena-row { background:rgba(31,41,55,.5); border-top:1px solid #4b5563; }
+    .arena-row:nth-child(odd) { background:rgba(31,41,55,.72); }
+    .song-name { color:#f5d0fe; font-family:'Courier New',monospace; font-weight:700; overflow-wrap:anywhere; }
+    .script-input, .obs-input, .song-input { display:block; box-sizing:border-box; width:100%; min-height:74px; resize:none; overflow:hidden; white-space:pre-wrap; overflow-wrap:anywhere; background:#374151; color:#f9fafb; border:1px solid #6b7280; border-radius:8px; padding:12px; line-height:1.55; }
+    .script-input:focus, .obs-input:focus, .song-input:focus { outline:none; border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,.35); }
+    .script-input[readonly], .obs-input[readonly], .song-input[readonly] { cursor:default; opacity:.95; }
+    .song-input { min-height:74px; color:#f5d0fe; font-family:'Courier New',monospace; font-weight:700; }
+    .login-input { width:100%; max-width:220px; color:#111827; border:1px solid #9ca3af; border-radius:6px; padding:7px 9px; }
+    .hidden { display:none !important; }
+    #auth-section { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .status { min-height:1.5rem; color:#d1d5db; }
+    .menu-action { border:0; background:transparent; color:#e5e7eb; cursor:pointer; font:inherit; }
+    .menu-action:hover, .menu-action:focus-visible { background:#1f2937; outline:none; }
+    .nav-more { position:relative; list-style:none; }
+    .nav-more > details > summary { list-style:none; cursor:pointer; }
+    .nav-more > details > summary::-webkit-details-marker { display:none; }
+    .nav-more-list { position:absolute; top:calc(100% + 4px); right:0; z-index:1100; min-width:220px; padding:6px; border:1px solid #374151; border-radius:9px; background:#111827; box-shadow:0 12px 28px rgba(0,0,0,.45); }
+    .nav-more-list .menu-action { display:block; width:100%; text-align:left; border-radius:6px; }
+    .info-dialog { width:min(780px,calc(100% - 24px)); max-height:88vh; padding:0; border:1px solid #4b5563; border-radius:14px; color:#f9fafb; background:linear-gradient(145deg,#1f2937,#111827); box-shadow:0 24px 70px rgba(0,0,0,.65); }
+    .info-dialog::backdrop { background:rgba(0,0,0,.78); backdrop-filter:blur(4px); }
+    .dialog-heading { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:16px 20px; border-bottom:1px solid #4b5563; background:rgba(0,0,0,.35); }
+    .dialog-content { padding:20px; overflow:auto; max-height:calc(88vh - 74px); }
+    .dialog-close { border:1px solid #6b7280; border-radius:8px; background:#374151; color:#fff; padding:7px 11px; }
+    .rider-wrap { overflow-x:auto; border:1px solid #6b7280; border-radius:8px; }
+    .rider-table { width:100%; min-width:560px; border-collapse:collapse; background:#f9fafb; color:#111827; }
+    .rider-table th, .rider-table td { border:1px solid #9ca3af; padding:12px 10px; text-align:left; vertical-align:middle; }
+    .rider-table th { background:#e5e7eb; font-weight:700; }
+    .rider-table td:nth-child(2), .rider-table th:nth-child(2) { text-align:center; width:64px; }
+    .arena-map { width:100%; height:auto; display:block; border:1px solid #4b5563; border-radius:12px; background:#0b1220; }
+    .map-legend { display:flex; flex-wrap:wrap; gap:10px 18px; margin-top:14px; color:#d1d5db; font-size:.9rem; }
+    .map-legend span::before { content:""; display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--dot); margin-right:7px; }
+    @media(max-width:700px) { .dialog-heading { padding:13px 15px; } .dialog-content { padding:15px; } }
+    @media(min-width:701px) and (max-width:1500px) {
+      header .header-inner { flex-direction:column; gap:12px; }
+      #auth-section { margin-top:0; }
+    }
+    @media(max-width:700px) {
+      header .header-inner { flex-direction:column; gap:12px; }
+      #auth-section { justify-content:center; }
+      .arena-head, .arena-row { grid-template-columns:minmax(86px,.8fr) minmax(0,2.2fr) minmax(72px,.8fr); }
+      .arena-head > div, .arena-row > div { padding:9px 8px; }
+      .script-input, .obs-input, .song-input { min-height:90px; padding:9px 7px; font-size:14px; }
+      .arena-head { font-size:13px; }
+    }
+    @media(max-width:420px) {
+      .arena-head, .arena-row { grid-template-columns:minmax(72px,.72fr) minmax(0,2fr) minmax(60px,.7fr); }
+      .arena-head > div, .arena-row > div { padding:8px 5px; }
+      .script-input, .obs-input, .song-input { min-height:84px; padding:7px 5px; font-size:12px; }
+      .song-name { font-size:13px; }
+    }
+  </style>
+</head>
+<body class="min-h-screen text-gray-100">
+  <header class="bg-black/80 backdrop-blur-md shadow-lg">
+    <div class="container mx-auto px-4 py-4 header-inner flex flex-col md:flex-row justify-between items-center">
+      <a href="https://villametal.github.io/villametal" aria-label="Villa-Metal - início">
+        <img src="Logo_Villa-Metal transparent.png" alt="Logo da Villa-Metal" class="w-36 md:w-52">
+      </a>
+      <nav aria-label="Navegação principal">
+        <ul class="flex flex-wrap justify-center gap-2 md:gap-3 text-sm md:text-base">
+          <li><button type="button" class="menu-action px-3 py-2 rounded-md hover:bg-gray-800 transition" data-open-modal="agenda-modal"><i class="fas fa-calendar-alt mr-2 text-red-500"></i>Agenda de Ensaios</button></li>
+          <li><button type="button" class="menu-action px-3 py-2 rounded-md hover:bg-gray-800 transition" data-open-modal="mapa-modal"><i class="fas fa-map-marked-alt mr-2 text-red-500"></i>Mapa de Palco</button></li>
+          <li><button type="button" class="menu-action px-3 py-2 rounded-md hover:bg-gray-800 transition" data-open-modal="rider-modal"><i class="fas fa-sliders-h mr-2 text-red-500"></i>Rider Técnico</button></li>
+        </ul>
+      </nav>
+      <section id="auth-section" aria-label="Acesso administrativo" class="mt-3 md:mt-0">
+        <form id="login-form" class="flex flex-col sm:flex-row gap-2 items-center">
+          <span class="text-sm text-center">Login de Administrador</span>
+          <input id="email" class="login-input" type="email" autocomplete="username" placeholder="Email" aria-label="Email" required>
+          <input id="password" class="login-input" type="password" autocomplete="current-password" placeholder="Senha" aria-label="Senha" required>
+          <button id="btn-login" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-md font-semibold" type="submit">Entrar</button>
+        </form>
+        <div id="admin-panel" class="hidden items-center gap-3">
+          <span id="admin-email" class="text-sm"></span>
+          <button id="btn-logout" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md" type="button">Sair</button>
+        </div>
+      </section>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-3 md:px-6 py-8 md:py-10">
+    <div class="text-center mb-6 md:mb-10">
+      <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-red-500 to-yellow-500 bg-clip-text text-transparent">ROTEIRO ARENA</h1>
+      <p class="text-gray-400 mt-2">Orientações de palco organizadas por música</p>
+    </div>
+    <section class="arena-table shadow-xl" aria-label="Roteiro por música">
+      <div class="arena-head" role="row"><div role="columnheader"><i class="fas fa-music mr-2"></i>MÚSICA</div><div role="columnheader"><i class="fas fa-scroll mr-2"></i>ROTEIRO</div><div role="columnheader"><i class="fas fa-sticky-note mr-2"></i>OBS.</div></div>
+      <div id="arena-rows" aria-live="polite"><p class="p-5 text-center text-gray-300">Carregando informações…</p></div>
+      <div id="admin-actions" class="hidden p-4 bg-gray-900/70 flex flex-wrap items-center gap-3">
+        <button id="add-row-btn" class="px-5 py-2 bg-red-600 hover:bg-red-700 rounded-md font-bold"><i class="fas fa-plus mr-2"></i>Adicionar linha</button>
+        <button id="save-btn" class="px-5 py-2 bg-green-600 hover:bg-green-700 rounded-md font-bold"><i class="fas fa-save mr-2"></i>Salvar alterações</button>
+        <button id="reset-btn" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-md">Descartar alterações</button>
+        <span id="save-status" class="status" role="status"></span>
+      </div>
+    </section>
+    <p id="page-status" class="status mt-4 text-center" role="status"></p>
+  </main>
+
+  <dialog id="agenda-modal" class="info-dialog" aria-labelledby="agenda-title">
+    <div class="dialog-heading">
+      <h2 id="agenda-title" class="text-xl md:text-2xl font-bold text-red-400"><i class="fas fa-calendar-alt mr-2"></i>Agenda de ensaios</h2>
+      <button type="button" class="dialog-close" data-close-modal aria-label="Fechar agenda"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="dialog-content">
+      <article class="rounded-lg border border-gray-600 bg-gray-900/70 p-4 md:p-5">
+        <p class="text-red-300 text-sm font-semibold mb-2">PRÓXIMO ENSAIO</p>
+        <p class="text-lg md:text-xl font-bold">1º ensaio: 10/11/2026 Terça-Feira - 19h - Auditório</p>
+      </article>
+    </div>
+  </dialog>
+
+  <dialog id="rider-modal" class="info-dialog" aria-labelledby="rider-title">
+    <div class="dialog-heading">
+      <h2 id="rider-title" class="text-xl md:text-2xl font-bold text-red-400"><i class="fas fa-sliders-h mr-2"></i>Rider técnico</h2>
+      <button type="button" class="dialog-close" data-close-modal aria-label="Fechar rider técnico"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="dialog-content">
+      <div class="rider-wrap">
+        <table class="rider-table">
+          <thead><tr><th>Instrumento/Músico</th><th>Qt.</th><th>Microfone/DI sugerido</th><th>Observações adicionais</th></tr></thead>
+          <tbody>
+            <tr><td>Bateria</td><td>1</td><td>Mic</td><td></td></tr>
+            <tr><td>Baixo</td><td>1</td><td>Mic / Amp</td><td>Tomada 110V/220V</td></tr>
+            <tr><td>Piano ou Teclado</td><td>1</td><td>Mic ou DI Box</td><td></td></tr>
+            <tr><td>Guitarra</td><td>2</td><td>Mic / Amp</td><td>Tomada 110V/220V</td></tr>
+            <tr><td>Voz</td><td>1</td><td>Mic</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="mapa-modal" class="info-dialog" aria-labelledby="mapa-title">
+    <div class="dialog-heading">
+      <h2 id="mapa-title" class="text-xl md:text-2xl font-bold text-red-400"><i class="fas fa-map-marked-alt mr-2"></i>Mapa de palco — Arena</h2>
+      <button type="button" class="dialog-close" data-close-modal aria-label="Fechar mapa de palco"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="dialog-content">
+      <p class="text-gray-300 mb-4">Modelo ilustrativo de palco em arena, com o público ao redor.</p>
+      <svg class="arena-map" viewBox="0 0 760 500" role="img" aria-labelledby="arena-map-title arena-map-desc">
+        <title id="arena-map-title">Mapa ilustrativo de palco em arena</title>
+        <desc id="arena-map-desc">Bateria ao fundo; teclado à esquerda e baixo à direita; um microfone ao centro; duas guitarras nas laterais dianteiras e outro microfone ao centro inferior. Público ao redor.</desc>
+        <defs>
+          <linearGradient id="stage-fill" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#26344c"/><stop offset="1" stop-color="#111827"/></linearGradient>
+          <filter id="stage-glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="8" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <rect width="760" height="500" fill="#0b1220"/>
+        <ellipse cx="380" cy="250" rx="345" ry="218" fill="#111827" stroke="#475569" stroke-width="3"/>
+        <ellipse cx="380" cy="250" rx="309" ry="185" fill="none" stroke="#334155" stroke-width="2" stroke-dasharray="5 8"/>
+        <text x="380" y="64" text-anchor="middle" fill="#cbd5e1" font-size="18" font-weight="700" letter-spacing="3">PÚBLICO • ARENA</text>
+        <text x="380" y="465" text-anchor="middle" fill="#cbd5e1" font-size="18" font-weight="700" letter-spacing="3">PÚBLICO • ARENA</text>
+        <text x="62" y="257" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="700" transform="rotate(-90 62 257)">PÚBLICO</text>
+        <text x="698" y="257" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="700" transform="rotate(90 698 257)">PÚBLICO</text>
+        <polygon points="280,118 480,118 545,182 545,318 480,382 280,382 215,318 215,182" fill="url(#stage-fill)" stroke="#ef4444" stroke-width="4" filter="url(#stage-glow)"/>
+        <g font-family="Arial,sans-serif" text-anchor="middle" font-weight="700">
+          <g><circle cx="380" cy="190" r="35" fill="#7f1d1d" stroke="#f87171" stroke-width="2"/><text x="380" y="194" fill="white" font-size="13">BATERIA</text></g>
+          <g><circle cx="292" cy="253" r="35" fill="#4c1d95" stroke="#c084fc" stroke-width="2"/><text x="292" y="257" fill="white" font-size="12">TECLADO</text></g>
+          <g><circle cx="468" cy="253" r="35" fill="#164e63" stroke="#22d3ee" stroke-width="2"/><text x="468" y="257" fill="white" font-size="13">BAIXO</text></g>
+          <g><circle cx="380" cy="292" r="28" fill="#14532d" stroke="#4ade80" stroke-width="2"/><text x="380" y="296" fill="white" font-size="13">MIC</text></g>
+          <g><circle cx="292" cy="327" r="35" fill="#78350f" stroke="#fbbf24" stroke-width="2"/><text x="292" y="331" fill="white" font-size="12">GUITARRA</text></g>
+          <g><circle cx="468" cy="327" r="35" fill="#78350f" stroke="#fbbf24" stroke-width="2"/><text x="468" y="331" fill="white" font-size="12">GUITARRA</text></g>
+          <g><circle cx="380" cy="365" r="24" fill="#14532d" stroke="#4ade80" stroke-width="2"/><text x="380" y="369" fill="white" font-size="12">MIC</text></g>
+        </g>
+      </svg>
+      <div class="map-legend" aria-label="Legenda do mapa">
+        <span style="--dot:#f87171">Bateria</span><span style="--dot:#c084fc">Teclado</span><span style="--dot:#22d3ee">Baixo</span><span style="--dot:#4ade80">Mic (2)</span><span style="--dot:#fbbf24">Guitarra (2)</span>
+      </div>
+    </div>
+  </dialog>
+
+  <footer class="bg-black/80 mt-16 py-6">
+    <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="text-center md:text-left"><h2 class="text-xl font-bold bg-gradient-to-r from-red-500 to-yellow-500 bg-clip-text text-transparent">VILLA-METAL</h2><p class="text-gray-400 mt-1 text-sm">Prática de conjunto de Metal da Escola de Música Villa-Lobos</p></div>
+      <div class="flex gap-5"><a href="https://www.instagram.com/villametal.emvl" target="_blank" rel="noreferrer" aria-label="Instagram" class="text-gray-400 hover:text-red-500"><i class="fab fa-instagram text-xl"></i></a><a href="https://www.youtube.com/@villametalemvl" target="_blank" rel="noreferrer" aria-label="YouTube" class="text-gray-400 hover:text-red-500"><i class="fab fa-youtube text-xl"></i></a></div>
+    </div>
+    <p class="border-t border-gray-800 mt-5 pt-4 text-center text-gray-500 text-xs">© 2025 todos os direitos reservados - <a href="https://wa.me/5521989978029" class="text-red-400" target="_blank" rel="noreferrer">Bru Cardoso Coder</a></p>
+  </footer>
+
+  <script>
+    document.querySelectorAll("[data-open-modal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        button.closest("details")?.removeAttribute("open");
+        document.getElementById(button.dataset.openModal)?.showModal();
+      });
+    });
+    document.querySelectorAll(".info-dialog").forEach((dialog) => {
+      dialog.querySelector("[data-close-modal]")?.addEventListener("click", () => dialog.close());
+      dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
+    });
+  </script>
+  <script type="module" src="roteiro-arena.js"></script>
+</body>
+</html>
