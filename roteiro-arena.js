@@ -2,10 +2,15 @@ import { auth, db } from "./firebase-config.js";
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { collection, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const ADMIN_EMAILS = ["villametal.emvl@gmail.com"];
+const ADMIN_EMAILS = [
+  "villametal.emvl@gmail.com",
+  "johnnybarathon@gmail.com"
+];
 const roteiroRef = doc(collection(db, "roteiroArena"), "current");
 const rowsHost = document.getElementById("arena-rows");
 const loginForm = document.getElementById("login-form");
+const authSection = document.getElementById("auth-section");
+const mobileAuthToggle = document.getElementById("mobile-auth-toggle");
 const adminPanel = document.getElementById("admin-panel");
 const adminActions = document.getElementById("admin-actions");
 const pageStatus = document.getElementById("page-status");
@@ -204,6 +209,12 @@ onAuthStateChanged(auth, async (user) => {
   }
   isAdmin = Boolean(user && isAllowedAdmin(user.email));
   loginForm.classList.toggle("hidden", isAdmin);
+  mobileAuthToggle.classList.toggle("hidden", isAdmin);
+  if (isAdmin) {
+    authSection.classList.remove("auth-expanded");
+    mobileAuthToggle.setAttribute("aria-expanded", "false");
+    mobileAuthToggle.setAttribute("aria-label", "Abrir login de administrador");
+  }
   adminPanel.classList.toggle("hidden", !isAdmin);
   adminPanel.classList.toggle("flex", isAdmin);
   adminActions.classList.toggle("hidden", !isAdmin);
